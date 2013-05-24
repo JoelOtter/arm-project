@@ -6,6 +6,12 @@ unsigned char* loadbinary(const char *filepath) {
 
     unsigned char *memory = malloc(65536);
 
+    // should malloc fail, print error message and return failure
+    if (memory == NULL) {
+        perror("malloc for memory failed");
+        exit(EXIT_FAILURE);
+    }
+
     FILE *fp;
     unsigned char k;
     int first = 1;
