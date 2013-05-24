@@ -2,12 +2,15 @@
 #include <stdio.h>
 #include <assert.h>
 
-void loadbinary(const char *filepath, char *dest) {
+unsigned char* loadbinary(const char *filepath) {
+
+    unsigned char *memory = malloc(65536);
 
     FILE *fp;
     unsigned char k;
     int first = 1;
     unsigned char j;
+    int count = 0;
 
     if ((fp = fopen(filepath, "rb")) == NULL) {
         perror("Error opening file");
@@ -19,21 +22,24 @@ void loadbinary(const char *filepath, char *dest) {
             j = k;
         }
         else {
-            printf("%x %x ", k, j);
+            memory[count] = k;
+            memory[++count] = j;
+            ++count;
         }
         first = 1 - first;
     }
 
-    printf("\n");
-
     fclose(fp);
+
+    return memory;
 }
 
 int main(int argc, char **argv) {
 
     assert(argc == 2);
 
-    char *memory = malloc(65536 * 8);
+    //sizeof char is always 1, so safe to assume malloc size is just total number of bytes
 
-    loadbinary(argv[1], memory);
+    unsigned char *memory = loadbinary(argv[1]);
+    printf("%x\n", memory[6]);
 }
