@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 void loadbinary(const char *filepath, char *dest) {
 
@@ -16,12 +17,11 @@ void loadbinary(const char *filepath, char *dest) {
     while(1 == fread(&k,sizeof(k),1,fp)) {
         if (first) {
             j = k;
-            first = 1 - first;
         }
         else {
             printf("%x %x ", k, j);
-            first = 1 - first;
         }
+        first = 1 - first;
     }
 
     printf("\n");
@@ -31,7 +31,9 @@ void loadbinary(const char *filepath, char *dest) {
 
 int main(int argc, char **argv) {
 
+    assert(argc == 2);
+
     char *memory = malloc(65536 * 8);
 
-    loadbinary("../../testsuite/test_cases/add01", memory);
+    loadbinary(argv[1], memory);
 }
