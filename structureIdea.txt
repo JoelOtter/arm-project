@@ -1,0 +1,30 @@
+Program layout, rough idea.
+
+do while halt = false {}
+
+1. condition check
+
+2. execute decoded instruction (if it exists)
+
+3. decode the fetched instruction
+
+4. fetch new instruction
+
+5. increment PC
+
+}
+
+1. Function to check the condition for execution
+
+2. Have four different functions depending on instruction type:
+    - execute_dataProcessing
+    - execute_multiply
+    - execute_singleDataTransfer
+    - execute_branch
+
+3. decoding the instruciton is just working it's type out so we know which execution function to send it to
+
+4. just fetched = memory[pc] ?
+
+
+We need to check whether instruction is 0 at some point and set halt. Not sure where this is most appropriate, probablt should be it's own function and called at the top? 
