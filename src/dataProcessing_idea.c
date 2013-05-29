@@ -14,8 +14,7 @@ enum opcodeType    {AND,
                     ORR,
                     MOV};
 
-uint32_t registers[20]; // just put it here so it compiles but 
-                       // can change it later 
+int *registers;
 
 // All the masks are up here
 const uint32_t mask1 =   1; // 0000 0001
@@ -25,6 +24,24 @@ const uint32_t mask5 =  31; // 0001 1111
 const uint32_t mask8 = 255; // 1111 1111 
 
 int carryout;
+
+void printBits(uint32_t x) {
+    
+    int i;
+
+    uint32_t mask = 1 << 31;
+
+    for(i=0; i<32; ++i) {
+        if((x & mask) == 0){
+            printf("0");
+        }else {
+            printf("1");
+        }
+        mask >>= 1;
+    }
+
+    printf("\n");
+}
 
 int checkCondition(uint32_t instruction) {
 
@@ -37,6 +54,8 @@ int checkCondition(uint32_t instruction) {
     uint32_t condNumber = mask4 & (instruction >> 28);
     int condflag = 0;
 
+    printf("instruction = %d\n", instruction);
+    printf("Con Num = %d\n", condNumber);
     switch(condNumber) {
 
         case(0):
@@ -68,10 +87,22 @@ int checkCondition(uint32_t instruction) {
             condflag = 1;
             break;
     }
+    printf("ConditionFlag = %d\n", condflag);
     return condflag;
 }
 
+uint32_t generateMask(uint32_t length){
 
+    uint32_t mask = 0;
+
+    for(uint32_t i = 0; i < length; i ++){
+
+        mask <<= 1;
+        mask += 1;
+
+    }
+    return mask;
+}
 
 
 
@@ -97,8 +128,6 @@ enum opcodeType getOpcode(uint32_t instruction) {
     }
    return op;
 }  
-
-
 
 
 int32_t getOperand1(uint32_t instruction) {
@@ -226,18 +255,35 @@ int32_t getOperand2(uint32_t instruction) {
 }
 
 
-void setFlags(int32_t value) {
+void setFlags(int32_t result, uint32_t S) {
     //update flags
    
+   if(S == 1) {
+
     uint32_t cspr = registers[16];
 
-    uint32_t N = (( value >> 31 ) & mask1) << 31 ;
-    uint32_t Z = (( value == 0 )  & mask1) << 30 ;
-    uint32_t C = ( carryout       & mask1) << 29 ;
+    // Set N if result is negative
+    uint32_t N = result & (1 << 31); 
+    // Set Z if result is zero
+    uint32_t Z = (result == 0) << 30 ;
+    printf("(Result == 0) = %d\n", (result == 0));
+    // Set carry out
+    uint32_t C = carryout << 29 ;
 
-    cspr = cspr & N & Z & C;
+    uint32_t csprMask = generateMask(28);
+    cspr &= csprMask;
+
+    printf("N    = "); printBits(N);
+    printf("Z    = "); printBits(Z);
+    printf("C    = "); printBits(C);
+    printf("cpsr = "); printBits(cspr);
+    cspr |= N | Z | C;
+    printf("cpsr = "); printBits(cspr);
 
     registers[16] = cspr;
+   }
+
+
 
 }
 
@@ -250,28 +296,30 @@ void executeInstruction(uint32_t instruction) {
     int32_t operand1 = getOperand1(instruction);
     int32_t operand2 = getOperand2(instruction);
     uint32_t destinationRegister = (mask4 & (instruction >> 12));
-    uint32_t S;
-    int32_t value;
+    uint32_t S = (instruction >> 20) & mask1;
+    int32_t result = registers[destinationRegister];
+    int32_t tempResult;
 
+    printf("S = %d\n", S);
     switch(op){
-        case(AND): value = (operand1 && operand2); break;
-        case(EOR): value = (operand1 ^ operand2) ; break;
-        case(SUB): value = (operand1 - operand2) ; break;
-        case(RSB): value = (operand2 - operand1) ; break;
-        case(ADD): value = (operand1 + operand2) ; break;
-        case(TST): operand1 && operand2          ; break; //TODO
-        case(TEQ): operand1 ^ operand2           ; break; //TODO
-        case(CMP): operand1 - operand2           ; break; //TODO
-        case(ORR): value = (operand1 || operand2); break;
-        case(MOV): value = operand2              ; break;
+
+        case(AND): result = (operand1 && operand2); setFlags(result, S); break;
+        case(EOR): result = (operand1 ^ operand2) ; setFlags(result, S); break;
+        case(SUB): result = (operand1 - operand2) ; setFlags(result, S); break;
+        case(RSB): result = (operand2 - operand1) ; setFlags(result, S); break;
+        case(ADD): result = (operand1 + operand2) ; setFlags(result, S); break;
+
+        case(TST): tempResult = operand1 && operand2 ; setFlags(tempResult, S); break; 
+        case(TEQ): tempResult = operand1 ^ operand2  ; setFlags(tempResult, S); break; 
+        case(CMP): tempResult = operand1 - operand2  ; setFlags(tempResult, S); break; 
+
+        case(ORR): result = (operand1 || operand2); setFlags(result, S); break;
+        case(MOV): result = operand2              ; setFlags(result, S); break;
     }
 
-    S = ( value >> 20 ) & mask1;
-    if ( S == 1 ) {
-        setFlags(value);
-    }
+    registers[destinationRegister] = result;
 
-    registers[destinationRegister] = value;
+
 
 }
 
@@ -282,12 +330,20 @@ int main(int argc, char const *argv[]) {
 
     uint32_t instruction = atoi(argv[1]);
 
+    registers = malloc(17 * sizeof(int)); // just put it here so it compiles but 
+                       // can change it later 
+
+    for(int x = 0; x < 17; ++x){
+        registers[x] = 0;
+    }
+    registers[0] = -7;
+
     if ( checkCondition(instruction) == 1 ) {
         executeInstruction(instruction);
-    } else { 
-        //ignore instruction? not sure what to put here //TODO
-    }
+    } 
 
+    printf("Registers[1] = %d\n", registers[1]);
+    printf("CPSR = "); printBits(registers[16]);
     return 0;
 }
 
