@@ -16,17 +16,17 @@ enum instructionType decode(uint32_t instruction){ //Instruction is 32 bits
     * explained further in switch comments
     */
     enum instructionType inst;       
-    const uint32_t mask3 =  7; //Binary equivelant = ... 0000 0111
-    const uint32_t mask4 = 15; // Binary equivalant = ...0000 1111
+    const uint32_t mask1 =  7; //Binary equivelant = ... 0000 0111
+    const uint32_t mask2 = 15; // Binary equivalant = ...0000 1111
     uint32_t shiftInst = instruction >> 25;
 
-    switch(mask3 & shiftInst){
+    switch(mask1 & shiftInst){
 
         case(0):
             // if result is (000) then could be either data processing or multiply. 
             // further examiination of bits 7 -  4 will determine the instruction type.
             shiftInst = instruction >> 4;
-            if((mask4 & shiftInst) == 9){
+            if((mask2 & shiftInst) == 9){
                 inst = MULTIPLY;
             } else {
                 inst = DATA_PROCESSING;

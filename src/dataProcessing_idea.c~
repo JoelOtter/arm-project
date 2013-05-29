@@ -26,6 +26,9 @@ const uint32_t mask8 = 255; // 1111 1111
 
 int carryout;
 
+
+
+
 int checkCondition(uint32_t instruction) {
 
     //CSPR register values
