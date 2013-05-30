@@ -1,11 +1,13 @@
 #include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+
+int *registers;
 
 //some scary masks
 const uint32_t mask1 = 1; //0000 0001
-const uint32_t mask4 = 4; //0000 0100
-const uint32_t mask12 = 12 //0000 1100
-
-int *registers;
+const uint32_t mask4 = 15; //0000 0100
+const uint32_t mask12 = 4095; //0000 1100
 
 //Blatantly thieved from dataProcessing_idea.c
 int checkCondition(uint32_t instruction) {
@@ -56,54 +58,29 @@ int checkCondition(uint32_t instruction) {
     return condflag;
 }
 
-uint32_t getImmediate(uint32_t instruction){
-	return ((instruction >> 25) & mask1);
-}
-
-uint32_t getPPIndex(uint32_t instruction){
-	return ((instruction >> 24) & mask1);
-}
-
-uint32_t getUp(uint32_t instruction){
-	return ((instruction >> 23) & mask1);
-}
-
-uint32_t getLoadStore(uint32_t instruction){
-	return ((instruction >> 20) & mask1);
-}
-
-uint32_t getBaseReg(uint32_t instruction){
-	return ((instruction >> 16) & mask4);
-}
-
-uint32_t getDestReg(uint32_t instruction){
-	return ((instruction >> 12) & mask4);
-}
-
-uint32_t getOffset(uint32_t instruction){
-	return (instruction & mask12);
-}
-
 void executeInstruction(uint32_t instruction){
-	printf("I am a badger, hear me growl\n");
+    uint32_t P = ((instruction >> 24) & mask1);
+    uint32_t U = ((instruction >> 23) & mask1);
+    uint32_t L = ((instruction >> 20) & mask1);
+    uint32_t I = ((instruction >> 25) & mask1);
+    uint32_t baseReg = ((instruction >> 16) & mask4);
+    uint32_t destReg = ((instruction >> 12) & mask4);
+    uint32_t offset = (instruction & mask12);
 }
 
 int main(int argc, char const *argv[]) {
 
-	uint32_t instruction = atoi(argv[1]);
+    uint32_t instruction = atoi(argv[1]);
 
-	//Obviously we can change this when merging it all.
-	registers = malloc(17 * sizeof(int));
+    //Obviously we can change this when merging it all.
+    registers = malloc(17 * sizeof(int));
 
-	for (int i = 0; i < 17; ++i){
-		registers[i] = 0;
-	}
+    for (int i = 0; i < 17; ++i){
+        registers[i] = 0;
+    }
 
-	if ( checkCondition(instruction) == 1 ) {
+    if ( checkCondition(instruction) == 1 ) {
         executeInstruction(instruction);
-    } 
-
-    printf("Registers[1] = %d\n", registers[1]);
-    printf("CPSR = "); printBits(registers[16]);
+    }
     return 0;
 }
