@@ -4,27 +4,23 @@
 
 \begin{document}
 
-\title{ARM Checkpoint... }
-\author{TODO}
+\title{ARM Checkpoint}
+\author{Joel Auterson, Denise Carroll, Zuhayr Chagpar, Jack Thorp}
 
 \maketitle
 
 \section{Group Organisation}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+Our group has been working well together; we all feel like we have contributed well to the emulator and have encountered no problems with group work so far. We have been meeting twice weekly to work on parts of the project together and discuss progress. For example, we began the project together by doing the binary file loader. We are also putting the parts we did seperately and pushed to GitHub together and have been keeping track of who is doing what.
+
+We are using GitHub for this project, which allows us to work independently on certain areas of the project. In our emulator we each did one of the four instructions. Splitting the work like this helped us to save time because we could work on it at any time of the day, and because we were regularly pushing to GitHub we could see each others work and share methods which avoids unnecessary rewriting.
 
 \section{Implementation Strategies}
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+So far, we have implemented each of the individual command types (data processing, branch, multiply and single data transfer), a decoder and a binary loader. The loader is currently the only method in our {\bf emulate.c}; each other component is in its own C file. These components are almost entirely finished, albeit not fully tested as of yet.
+
+We are currently working to refactor our code together, using header files and linking. This is proving so far not to be overly taxing, due to the fact that many of the helper methods used are identical in each component. For example, our {\it getOperand2} method is used in both the arithmetic and the single data transfer, along with methods like {\it shiftLeft} and {\it rotate}, and our {\it checkConditions} method is used in all four of the commands. Many of these methods, in particular the shifts and rotates, will be useful when building the assembler.
+
+Our next step is to implement the pipeline system so that instructions are fetched, decoded and executed concurrently.
 
 \end{document}
