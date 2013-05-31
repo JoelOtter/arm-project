@@ -14,8 +14,6 @@ enum opcodeType    {AND,
                     ORR,
                     MOV};
 
-int carryout;
-
 static enum opcodeType getOpcode(uint32_t instruction) {
 
     uint32_t opNumber= mask4 & (instruction >> 21);

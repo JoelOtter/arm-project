@@ -1,60 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <assert.h>
-
-uint32_t generateMask(uint32_t length){
-
-    uint32_t mask = 0;
-
-    for(uint32_t i = 0; i < length; i ++){
-
-        mask <<= 1;
-        mask += 1;
-
-    }
-    return mask;
-}
-
-void printBits(uint32_t x) {
-    
-    int i;
-
-    uint32_t mask = 1 << 31;
-
-    for(i=0; i<32; ++i) {
-        if((x & mask) == 0){
-            printf("0");
-        }else {
-            printf("1");
-        }
-        mask >>= 1;
-    }
-
-    printf("\n");
-}
-
-int SignExtend(int value, int length){
-
-    uint32_t sign = value >> (length - 1);    //Gets most significant bit, the sign!!
-    uint32_t extension = 32 - length;    
-
-    if (sign == 1) {
-
-        uint32_t mask = 0;
-
-        for (uint32_t i = 0; i < extension; ++i)
-        {
-          mask <<= 1;
-          mask += 1;
-        }  
-        mask <<= length;
-        value |= mask;
-    }
-    return value;
-
-}
-
+#include "library.h"
+#include "branch.h"
 
 int getOffset(uint32_t instruction){
 
@@ -74,11 +21,13 @@ int getOffset(uint32_t instruction){
      
 }
 
-int main(int argc, char **argv){
+void branch(uint32_t instruction){
 
-    uint32_t instruction = atoi(argv[1]);
-    
-    printf("Instruction = "); printBits(instruction);
-    printf("Offset =      "); printBits(getOffset(instruction));
+    // Need to increase PC 
+
+    registers[15] += getOffset(instruction);
+
+    // printf("Instruction = "); printBits(instruction);
+    // printf("Offset =      "); printBits(getOffset(instruction));
 
 }
