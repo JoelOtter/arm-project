@@ -18,14 +18,18 @@ static int checkCondition(uint32_t instruction);
 
 static enum instructionType decode(uint32_t instruction);
 
+static uint32_t getInstruction(int start);
+
 void print_registers(void);
 
 void print_memory(void);
 
+void printNonZeroMemory(void);
+
 
 int main(int argc, char **argv) {
 
-    memory = malloc(65536);
+    memory = calloc(65536, sizeof(char));
     registers = calloc(17, sizeof(int32_t));
 
     assert(argc == 2);
@@ -34,7 +38,7 @@ int main(int argc, char **argv) {
 
     loadbinary(argv[1]);
 
-    //print_memory();
+    print_memory();
 
 
 
@@ -43,10 +47,10 @@ int main(int argc, char **argv) {
     //DO we need to initialise the registers to 0 explicitly????
     int32_t *PC = &registers[15];
     *PC = 8;
-    uint32_t fetched = memory[7];
+    uint32_t fetched = getInstruction(4);
     printf("Fetched instr: "); printBits(fetched);
-    uint32_t decoded = memory[3];
-    enum instructionType current_Inst_Type = decode(memory[0]);
+    uint32_t decoded = getInstruction(0);
+    enum instructionType current_Inst_Type = decode(decoded);
 
     while(decoded != 0){
         
@@ -74,14 +78,15 @@ int main(int argc, char **argv) {
         decoded = fetched;
 
         //Fetch new instruction
-        fetched = memory[*PC];
+        fetched = getInstruction(*PC);
 
         //Increment PC to next instruction
         *PC += 4; 
 
     }
 
-    //print_registers();
+    print_registers();
+    printNonZeroMemory();
 
     free(memory);
     free(registers);
@@ -209,6 +214,18 @@ static enum instructionType decode(uint32_t instruction){ //Instruction is 32 bi
 
 }  
 
+static uint32_t getInstruction(int start) {
+
+    uint32_t p1 = memory[start+3] << 24;
+    uint32_t p2 = memory[start+2] << 16;
+    uint32_t p3 = memory[start+1] << 8;
+    uint32_t p4 = memory[start];
+
+    return (p1 | p2 | p3 | p4);
+
+
+}
+
 // Functions for testing!!!
 
 void print8bits(uint8_t x) {
@@ -243,5 +260,15 @@ void print_memory(void){
         printf("Memory[%d] =\t ", x); print8bits(memory[x]);
     }
     printf("\n");
+}
+
+void printNonZeroMemory(void) {
+    printf("Non Zero Memory\n");
+    for (int i = 0; i< 65; i+=4) {
+        uint32_t memoryThing = getInstruction(i);
+        if (memoryThing != 0) {
+            printf("%x: %x\n", i, memoryThing);
+        }
+    }
 }
 
