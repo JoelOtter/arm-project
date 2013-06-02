@@ -12,7 +12,7 @@ multiply.o: multiply.c multiply.h emulate.h library.h
 		$(CC) $(CFLAGS) multiply.c -c -o multiply.o
 
 data_Process.o: data_Process.c data_Process.h emulate.h library.h
-		$(CC) $(CFLAGS) data_Process.c -c -o data_process.o
+		$(CC) $(CFLAGS) data_Process.c -c -o data_Process.o
 
 sdatatrans.o: sdatatrans.c sdatatrans.h emulate.h library.h
 		$(CC) $(CFLAGS) sdatatrans.c -c -o sdatatrans.o
