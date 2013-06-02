@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
 
     loadbinary(argv[1]);
 
-    print_memory();
+    //print_memory();
 
 
 
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
     int32_t *PC = &registers[15];
     *PC = 8;
     uint32_t fetched = getInstruction(4);
-    printf("Fetched instr: "); printBits(fetched);
+    //printf("Fetched instr: "); printBits(fetched);
     uint32_t decoded = getInstruction(0);
     enum instructionType current_Inst_Type = decode(decoded);
 
@@ -129,8 +129,8 @@ static int checkCondition(uint32_t instruction) {
     uint32_t condNumber = mask4 & (instruction >> 28);
     int condflag = 0;
 
-    printf("instruction = %d\n", instruction);
-    printf("Con Num = %d\n", condNumber);
+    //printf("instruction = %x\n", instruction);
+    //printf("Con Num = %x\n", condNumber);
     switch(condNumber) {
 
         case(0):
@@ -162,7 +162,7 @@ static int checkCondition(uint32_t instruction) {
             condflag = 1;
             break;
     }
-    printf("ConditionFlag = %d\n", condflag);
+    //printf("ConditionFlag = %x\n", condflag);
     return condflag;
 }
 
@@ -248,9 +248,22 @@ void print8bits(uint8_t x) {
 
 void print_registers(void){
 
-    for(int i = 0; i < 17; ++i){
-        printf("R%d = ", i); printBits(registers[i]);
-    }
+    printf("Registers:\n");
+    printf("$0   : %10d (0x%08x)\n", registers[0],registers[0]);
+    printf("$1   : %10d (0x%08x)\n", registers[1],registers[1]);
+    printf("$2   : %10d (0x%08x)\n", registers[2],registers[2]);
+    printf("$3   : %10d (0x%08x)\n", registers[3],registers[3]);
+    printf("$4   : %10d (0x%08x)\n", registers[4],registers[4]);
+    printf("$5   : %10d (0x%08x)\n", registers[5],registers[5]);
+    printf("$6   : %10d (0x%08x)\n", registers[6],registers[6]);
+    printf("$7   : %10d (0x%08x)\n", registers[7],registers[7]);
+    printf("$8   : %10d (0x%08x)\n", registers[8],registers[8]);
+    printf("$9   : %10d (0x%08x)\n", registers[9],registers[9]);
+    printf("$10  : %10d (0x%08x)\n", registers[10],registers[10]);
+    printf("$11  : %10d (0x%08x)\n", registers[11],registers[11]);
+    printf("$12  : %10d (0x%08x)\n", registers[12],registers[12]);
+    printf("$PC  : %10d (0x%08x)\n", registers[15],registers[15]);
+    printf("$CSPR: %10d (0x%08x)\n", registers[16],registers[16]);
 
 }
 
@@ -263,11 +276,11 @@ void print_memory(void){
 }
 
 void printNonZeroMemory(void) {
-    printf("Non Zero Memory\n");
+    printf("Non-zero memory\n");
     for (int i = 0; i< 65; i+=4) {
         uint32_t memoryThing = getInstruction(i);
         if (memoryThing != 0) {
-            printf("%x: %x\n", i, memoryThing);
+            printf("0x%08x: 0x%x\n", i, memoryThing);
         }
     }
 }

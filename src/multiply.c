@@ -28,16 +28,16 @@ static void setFlagsMultiply(uint32_t result, uint32_t S) {
     uint32_t N = result & (1 << 31); 
     // Set Z if result is zero
     uint32_t Z = (result == 0) << 30 ;
-    printf("(Result == 0) = %d\n", (result == 0));
+    //printf("(Result == 0) = %d\n", (result == 0));
     //generate mask of 30 since V and C are unchanged
     uint32_t cpsrMask = generateMask(30);
     cpsr &= cpsrMask;
 
-    printf("N    = "); printBits(N);
-    printf("Z    = "); printBits(Z);
-    printf("cpsr = "); printBits(cpsr);
+    //printf("N    = "); printBits(N);
+    //printf("Z    = "); printBits(Z);
+    //printf("cpsr = "); printBits(cpsr);
     cpsr |= N | Z;
-    printf("cpsr = "); printBits(cpsr);
+    //printf("cpsr = "); printBits(cpsr);
 
     registers[16] = cpsr;
    }
@@ -53,11 +53,11 @@ void multiply(uint32_t instruction) {
     uint32_t S = (instruction >> 20) & mask1;
 
     uint32_t temp = registers[Rm] * registers[Rs];
-    printf("%u\n%u\n%u\n", registers[Rm], registers[Rs], temp);
+    //printf("%u\n%u\n%u\n", registers[Rm], registers[Rs], temp);
 
     // if accumulate bit is set, then also add value of Rn
     if ((instruction >> 21) & mask1) {
-        printf("ACCUMULATOR\n");
+        //printf("ACCUMULATOR\n");
         temp += registers[Rn];
     } 
     registers[Rd] = temp;
