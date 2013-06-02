@@ -282,7 +282,7 @@ void printNonZeroMemory(void) {
     for (int i = 0; i< 65; i+=4) {
         uint32_t memoryThing = getInstruction(i);
         if (memoryThing != 0) {
-            printf("0x%08x: 0x%x\n", i, memoryThing);
+            printf("0x%08x: 0x%08x\n", i, memoryThing);
         }
     }
 }
