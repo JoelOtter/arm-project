@@ -249,21 +249,23 @@ void print8bits(uint8_t x) {
 void print_registers(void){
 
     printf("Registers:\n");
-    printf("$0   : %10d (0x%08x)\n", registers[0],registers[0]);
-    printf("$1   : %10d (0x%08x)\n", registers[1],registers[1]);
-    printf("$2   : %10d (0x%08x)\n", registers[2],registers[2]);
-    printf("$3   : %10d (0x%08x)\n", registers[3],registers[3]);
-    printf("$4   : %10d (0x%08x)\n", registers[4],registers[4]);
-    printf("$5   : %10d (0x%08x)\n", registers[5],registers[5]);
-    printf("$6   : %10d (0x%08x)\n", registers[6],registers[6]);
-    printf("$7   : %10d (0x%08x)\n", registers[7],registers[7]);
-    printf("$8   : %10d (0x%08x)\n", registers[8],registers[8]);
-    printf("$9   : %10d (0x%08x)\n", registers[9],registers[9]);
-    printf("$10  : %10d (0x%08x)\n", registers[10],registers[10]);
-    printf("$11  : %10d (0x%08x)\n", registers[11],registers[11]);
-    printf("$12  : %10d (0x%08x)\n", registers[12],registers[12]);
-    printf("$PC  : %10d (0x%08x)\n", registers[15],registers[15]);
-    printf("$CSPR: %10d (0x%08x)\n", registers[16],registers[16]);
+    printf("$0  : %10d (0x%08x)\n", registers[0],registers[0]);
+    printf("$1  : %10d (0x%08x)\n", registers[1],registers[1]);
+    printf("$2  : %10d (0x%08x)\n", registers[2],registers[2]);
+    printf("$3  : %10d (0x%08x)\n", registers[3],registers[3]);
+    printf("$4  : %10d (0x%08x)\n", registers[4],registers[4]);
+    printf("$5  : %10d (0x%08x)\n", registers[5],registers[5]);
+    printf("$6  : %10d (0x%08x)\n", registers[6],registers[6]);
+    printf("$7  : %10d (0x%08x)\n", registers[7],registers[7]);
+    printf("$8  : %10d (0x%08x)\n", registers[8],registers[8]);
+    printf("$9  : %10d (0x%08x)\n", registers[9],registers[9]);
+    printf("$10 : %10d (0x%08x)\n", registers[10],registers[10]);
+    printf("$11 : %10d (0x%08x)\n", registers[11],registers[11]);
+    printf("$12 : %10d (0x%08x)\n", registers[12],registers[12]);
+    printf("SP  : %10d (0x%08x)\n", registers[13],registers[13]);
+    printf("LR  : %10d (0x%08x)\n", registers[14],registers[14]);
+    printf("PC  : %10d (0x%08x)\n", registers[15],registers[15]);
+    printf("CPSR: %10d (0x%08x)\n", registers[16],registers[16]);
 
 }
 
@@ -276,7 +278,7 @@ void print_memory(void){
 }
 
 void printNonZeroMemory(void) {
-    printf("Non-zero memory\n");
+    printf("Non-zero memory:\n");
     for (int i = 0; i< 65; i+=4) {
         uint32_t memoryThing = getInstruction(i);
         if (memoryThing != 0) {
