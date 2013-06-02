@@ -16,7 +16,6 @@ static int getOffset(uint32_t instruction){
     int offset = instruction & mask24;  //Get mask
     offset = SignExtend(offset, 24);    
     offset <<= 2;                       //Shift offset to the left by 2.
-    offset -= 8;                        // Subtract 8 from the offset.
     
     return offset; 
      
