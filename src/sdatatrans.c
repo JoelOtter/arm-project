@@ -2,6 +2,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <assert.h>
+#include "sdatatrans.h"
+#include "emulate.h"
+#include "library.h"
 
 //Blatantly thieved from dataProcessing_idea.c
 

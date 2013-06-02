@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include "library.h"
+#include "emulate.h"
 
 enum opcodeType    {AND,
                     EOR,

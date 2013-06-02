@@ -2,6 +2,9 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <assert.h>
+#include "emulate.h"
+#include "data_Process.h"
+#include "library.h"
 
 enum opcodeType    {AND,
                     EOR,
@@ -162,34 +165,3 @@ void data_Process(uint32_t instruction) {
 
 
 }
-
-
-
-
-/*int main(int argc, char const *argv[]) {
-
-    uint32_t instruction = atoi(argv[1]);
-
-    registers = malloc(17 * sizeof(int)); // just put it here so it compiles but 
-                       // can change it later 
-
-    for(int x = 0; x < 17; ++x){
-        registers[x] = 0;
-    }
-    registers[0] = -7;
-
-    if ( checkCondition(instruction) == 1 ) {
-        executeInstruction(instruction);
-    } 
-
-    printf("Registers[1] = %d\n", registers[1]);
-    printf("CPSR = "); printBits(registers[16]);
-    return 0;
-}
-*/
-
-
-
-
-
-

@@ -2,8 +2,9 @@
 #include <stdint.h>
 #include "library.h"
 #include "branch.h"
+#include "emulate.h"
 
-int getOffset(uint32_t instruction){
+static int getOffset(uint32_t instruction){
 
     // We want to increase PC by the amount specified by the offset.
     // We want to add to the value of the PC when the instruction was fetched
@@ -13,7 +14,7 @@ int getOffset(uint32_t instruction){
     
     uint32_t mask24 = generateMask(24); //Generate's mask of length 24; bit 23- bit0
     int offset = instruction & mask24;  //Get mask
-    offset =SignExtend(offset, 24);    
+    offset = SignExtend(offset, 24);    
     offset <<= 2;                       //Shift offset to the left by 2.
     offset -= 8;                        // Subtract 8 from the offset.
     
@@ -22,12 +23,5 @@ int getOffset(uint32_t instruction){
 }
 
 void branch(uint32_t instruction){
-
-    // Need to increase PC 
-
     registers[15] += getOffset(instruction);
-
-    // printf("Instruction = "); printBits(instruction);
-    // printf("Offset =      "); printBits(getOffset(instruction));
-
 }
