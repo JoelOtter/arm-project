@@ -18,34 +18,37 @@ static int checkCondition(uint32_t instruction);
 
 static enum instructionType decode(uint32_t instruction);
 
+void print_registers(void);
+
+void print_memory(void);
+
 
 int main(int argc, char **argv) {
-
-    assert(argc == 2);
-    loadbinary(argv[1]);
 
     memory = malloc(65536);
     registers = calloc(17, sizeof(int32_t));
 
+    assert(argc == 2);
+
+    //print_memory();
+
+    loadbinary(argv[1]);
+
+    //print_memory();
+
+
+
+    //print_registers();
+
     //DO we need to initialise the registers to 0 explicitly????
     int32_t *PC = &registers[15];
     *PC = 8;
-    uint32_t fetched = memory[4];
-    uint32_t decoded = memory[0];
+    uint32_t fetched = memory[7];
+    printf("Fetched instr: "); printBits(fetched);
+    uint32_t decoded = memory[3];
     enum instructionType current_Inst_Type = decode(memory[0]);
 
     while(decoded != 0){
-
-        /*  1. Check condition of decoded.
-            1.a Execute the current instruction.
-
-            2.Decode the fetched instruction.
-
-            3.Fetch new instruction.
-
-            4.Increase PC.
-
-        */
         
         // If condition is satisfied, execute current instruction!
         if(checkCondition(decoded)){
@@ -77,6 +80,11 @@ int main(int argc, char **argv) {
         *PC += 4; 
 
     }
+
+    //print_registers();
+
+    free(memory);
+    free(registers);
 }
 
 static void loadbinary(const char *filepath) {
@@ -200,3 +208,40 @@ static enum instructionType decode(uint32_t instruction){ //Instruction is 32 bi
    return inst;
 
 }  
+
+// Functions for testing!!!
+
+void print8bits(uint8_t x) {
+    
+    int i;
+
+    uint8_t mask = 1 << 7;
+
+    for(i=0; i<8; ++i) {
+        if((x & mask) == 0){
+            printf("0");
+        }else {
+            printf("1");
+        }
+        mask >>= 1;
+    }
+
+    printf("\n");
+}
+
+void print_registers(void){
+
+    for(int i = 0; i < 17; ++i){
+        printf("R%d = ", i); printBits(registers[i]);
+    }
+
+}
+
+void print_memory(void){
+    for(int x = 0; x < 12; x++){
+        if((x % 4) == 0){printf("\n");}
+        printf("Memory[%d] =\t ", x); print8bits(memory[x]);
+    }
+    printf("\n");
+}
+
