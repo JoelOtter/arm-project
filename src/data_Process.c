@@ -146,17 +146,17 @@ void data_Process(uint32_t instruction) {
     //printf("S = %d\n", S);
     switch(op){
 
-        case(AND): result = (operand1 && operand2); setFlags(result, S); break;
+        case(AND): result = (operand1 & operand2); setFlags(result, S); break;
         case(EOR): result = (operand1 ^ operand2) ; setFlags(result, S); break;
         case(SUB): result = (operand1 - operand2) ; setFlags(result, S); break;
         case(RSB): result = (operand2 - operand1) ; setFlags(result, S); break;
         case(ADD): result = (operand1 + operand2) ; setFlags(result, S); break;
 
-        case(TST): tempResult = operand1 && operand2 ; setFlags(tempResult, S); break; 
+        case(TST): tempResult = operand1 & operand2 ; setFlags(tempResult, S); break; 
         case(TEQ): tempResult = operand1 ^ operand2  ; setFlags(tempResult, S); break; 
         case(CMP): tempResult = operand1 - operand2  ; setFlags(tempResult, S); break; 
 
-        case(ORR): result = (operand1 || operand2); setFlags(result, S); break;
+        case(ORR): result = (operand1 | operand2); setFlags(result, S); break;
         case(MOV): result = operand2              ; setFlags(result, S); break;
     }
 
