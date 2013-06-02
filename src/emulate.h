@@ -15,12 +15,12 @@ enum instructionType    {DATA_PROCESSING,
 
 int main(int argc, char **argv);
 
-static void loadbinary(const char *filepath);
+/*static void loadbinary(const char *filepath);
 
 static int checkCondition(uint32_t instruction);
 
 static enum instructionType decode(uint32_t instruction);
 
-
+*/
 
 #endif

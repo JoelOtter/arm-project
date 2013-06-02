@@ -9,15 +9,23 @@
 #include "emulate.h"
 #include "library.h"
 
+unsigned char *memory;
+int32_t *registers;
 
+static void loadbinary(const char *filepath);
 
-unsigned char *memory = malloc(65536);
-int32_t *registers = calloc(17, sizeof(int32_t));
+static int checkCondition(uint32_t instruction);
+
+static enum instructionType decode(uint32_t instruction);
+
 
 int main(int argc, char **argv) {
 
     assert(argc == 2);
     loadbinary(argv[1]);
+
+    memory = malloc(65536);
+    registers = calloc(17, sizeof(int32_t));
 
     //DO we need to initialise the registers to 0 explicitly????
     int32_t *PC = &registers[15];

@@ -75,7 +75,7 @@ static int32_t getOperand2(uint32_t instruction) {
         uint32_t rm    = mask4 & instruction;      // rm      instruction(3 -0)
         
         uint32_t rmValue = registers[rm];
-        int32_t temp;
+        
         switch(shiftType) {
             case(0): 
                 result = logShiftLeft(rmValue, scale);
