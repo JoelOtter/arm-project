@@ -68,10 +68,13 @@ static int32_t getOperand2(uint32_t instruction) {
     } else {
 
         //Operand2 register
-
         uint32_t shift = mask8 & (instruction >> 4);    // shift   instruction(11-4)
         uint32_t shiftType = mask2 & (shift >> 1); //  - shift type shift(6 -5)
-        uint32_t scale   = mask5 & (shift >> 3); //  - integer    shift(11-7)
+
+        uint32_t scale = mask5 & (shift >> 3); //  - integer    shift(11-7)
+        if (shift & mask1) {
+            scale = registers[mask4 & (shift >> 4)];
+        }
         uint32_t rm    = mask4 & instruction;      // rm      instruction(3 -0)
         
         uint32_t rmValue = registers[rm];
