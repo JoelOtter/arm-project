@@ -71,7 +71,8 @@ static void store(uint32_t P, uint32_t U, uint32_t offset, uint32_t baseReg, uin
     if (!U) offsetNew = offsetNew * (-1);
     uint32_t regValue = registers[baseReg];
     if (P) regValue += offsetNew;
-    memory[regValue] = registers[destReg];
+    if (regValue + 3 < SIZE_OF_MEMORY) writeToMemory(memory, regValue, registers[destReg]);
+    else printf("Error: Out of bounds memory access at address 0x%08x\n", regValue);
     if (!P) registers[baseReg] += offsetNew;
 }
 

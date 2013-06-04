@@ -24,6 +24,13 @@ uint32_t get_from_memory(unsigned char *memory, int start) {
     return (p1 | p2 | p3 | p4);
 }
 
+void writeToMemory(unsigned char *memory, int start, uint32_t value) {
+    memory[start+3] = value >> 24;
+    memory[start+2] = value >> 16;
+    memory[start+1] = value >> 8;
+    memory[start] = value;
+}
+
 void print_registers(int *registers){
 
     printf("Registers:\n");
