@@ -4,6 +4,7 @@
 //VARIABLES
 extern unsigned char *memory;
 extern int *registers;
+extern const int SIZE_OF_MEMORY;
 
 //ENUMS
 enum instructionType    {DATA_PROCESSING,

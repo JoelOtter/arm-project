@@ -8,8 +8,6 @@
 
 //Blatantly thieved from dataProcessing_idea.c
 
-static uint32_t get_from_memory(int start);
-
 static uint32_t getOperand2(uint32_t instruction) {
     //Operand2 is either immediate (in which case we just take the value and extend)
     //Or it is in a register in which case we have to apply shift operations
@@ -63,7 +61,8 @@ static void load(uint32_t P, uint32_t U, uint32_t offset, uint32_t baseReg, uint
     if (!U) offsetNew = offsetNew * (-1);
     uint32_t regValue = registers[baseReg];
     if (P) regValue += offsetNew;
-    registers[destReg] = get_from_memory(regValue);
+    if (regValue + 3 < SIZE_OF_MEMORY) registers[destReg] = get_from_memory(memory, regValue);
+    else printf("Error: Out of bounds memory access at address 0x%08x\n", regValue);
     if (!P) registers[baseReg] += offsetNew;
 }
 
@@ -88,14 +87,3 @@ void single_data_transfer(uint32_t instruction){
     else store(P, U, offset, baseReg, destReg);
 }
 
-static uint32_t get_from_memory(int start) {
-
-    uint32_t p1 = memory[start+3] << 24;
-    uint32_t p2 = memory[start+2] << 16;
-    uint32_t p3 = memory[start+1] << 8;
-    uint32_t p4 = memory[start];
-
-    return (p1 | p2 | p3 | p4);
-
-
-}
