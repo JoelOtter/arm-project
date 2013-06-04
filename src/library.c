@@ -65,6 +65,7 @@ uint32_t generateMask(uint32_t length){
 uint32_t logShiftLeft(uint32_t value, uint32_t scale) {
 
     carryout = (value >> (32 - scale)) & mask1;
+    if (scale == 0) carryout = 0;
     value <<= scale;
     return value;
 
