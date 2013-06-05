@@ -26,16 +26,49 @@ void writeBinary(char *path, char *write){
     }
 }
 
+char* getNmonic(char *instruction){
+    
+    int i = 0;
+    char *nmonic = malloc(10);
+    while(instruction[i] != ' '){
+        nmonic[i] = instruction[i];
+        i++;
+    }
+    
+    return nmonic;
+}
+
 int main(int argc, char **argv) {
     assert(argc == 3);
 
     char *srcpath = argv[1];
     char *destpath = argv[2];
+    
+    char *nmonic;
+    int size = 512;
+    char currLine[size];
+    FILE *fp;
 
-    char *toWrite = malloc(4 * sizeof(char));
+    if ((fp = fopen(srcpath, "r")) == NULL) {
+            perror("Error opening file.txt!");
+            exit(EXIT_FAILURE);
+    }
+    
+    while(fgets(currLine, size, fp) != NULL){
+      
+      nmonic = getNmonic(currLine);
+      printf("%s\n", nmonic);
+    
+    }
+
+    fclose(fp);
+
+
+/*    char *toWrite = malloc(4 * sizeof(char));
     toWrite[0] = 1;
     toWrite[1] = 2;
     toWrite[2] = 3;
     toWrite[3] = 4;
     writeBinary(destpath, toWrite);
+*/
 }
