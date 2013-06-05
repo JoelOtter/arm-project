@@ -7,25 +7,23 @@
 table symbol_table;
 table instruction_table;
 
-void writeBinary(char *path, char *write){
+void writeBinary(char *path, uint32_t write){
+    //This takes one uint32_t at a time, and appends it to the
+    //end of the binary file in little-endian format.
     FILE *fp;
-    int k = 3;
-    int zeroHit = 0;
-    int zero = 0;
-
-    fp = fopen(path, "wb");
-    while(1) {
-        if (write[k] == 0){
-            fwrite(&zero, sizeof(char), 1, fp);
-            zeroHit = 1;
-        }
-        else {
-            fwrite(&write[k], sizeof(write[k]), 1, fp);
-        }
-        if (k % 4 == 0 && zeroHit) break;
-        else if (k % 4 == 0) k += 7;
-        else --k;
-    }
+    fp = fopen(path, "ab");
+    /* //This is conversion code, which apparently we don't
+    //need - fwrite writes in little endian!
+    uint32_t toWrite = 0;
+    uint32_t mask8 = 255;
+    toWrite += ((write >> 24) & mask8);
+    toWrite += (((write >> 16) & mask8) << 8);
+    toWrite += (((write >> 8) & mask8) << 16);
+    toWrite += ((write & mask8) << 24);
+    fwrite(&write, sizeof(uint32_t), 1, fp);
+    fwrite(&toWrite, sizeof(uint32_t), 1, fp);*/
+    fwrite(&write, sizeof(uint32_t), 1, fp);
+    fclose(fp);
 }
 
 char* getNmonic(char *instruction){
@@ -47,7 +45,7 @@ char* getNmonic(char *instruction){
 
 int main(int argc, char **argv) {
     assert(argc == 3);
-    
+
     char *srcpath = argv[1];
     char *destpath = argv[2];
     
@@ -81,7 +79,7 @@ int main(int argc, char **argv) {
       printf("%s\n", nmonic);
     */
     // this is is purely to remove the \n that fgets adds to end of currLine
-     if (currLine[strlen(currLine) - 1] == '\n') currLine[strlen(currLine) - 1] = '\0';
+    if (currLine[strlen(currLine) - 1] == '\n') currLine[strlen(currLine) - 1] = '\0';
       if (currLine[strlen(currLine) -1] == ':') {
           printf("symbol table ins, (%s), %d\n", currLine, i*4);
           insert_elem(&symbol_table, currLine, i);
@@ -96,13 +94,4 @@ int main(int argc, char **argv) {
     
         
     fclose(fp);
-
-
-/*    char *toWrite = malloc(4 * sizeof(char));
-    toWrite[0] = 1;
-    toWrite[1] = 2;
-    toWrite[2] = 3;
-    toWrite[3] = 4;
-    writeBinary(destpath, toWrite);
-*/
 }
