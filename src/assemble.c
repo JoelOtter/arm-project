@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#include "symboltableadt.h"
+
+table symbol_table;
 
 void writeBinary(char *path, char *write){
     FILE *fp;

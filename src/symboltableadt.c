@@ -20,6 +20,7 @@ Have not implemented delete - seems uneccessary for assembler
 */
 
 
+
 struct table {
     struct table_elem *first;
     int32_t size;
@@ -33,6 +34,7 @@ struct table_elem {
     struct table_elem *next;
 };
 
+struct table t;
 
 struct table_elem *table_alloc_elem(void) {
     //allocates memory for a new 'node/entry/elem' in the table
@@ -50,6 +52,12 @@ void table_constructor(struct table *table) {
     table->first         = table_alloc_elem();
     table->first->prev   = NULL;
     table->first->next   = NULL;
+}
+
+void create_table(void) {
+
+    table_constructor(&t);
+
 }
 
 
@@ -113,13 +121,10 @@ int32_t search_for_memory_address(struct table *table, char *label) {
 
 }
 
-
+ /*
 int main(int argc, char **argv) {
 
-    /* Tests:
-
-    struct table t;
-    table_constructor(&t);
+    create_table();
 
     insert_elem(&t, "Denise", 100);
     insert_elem(&t, "Zues", 99);
@@ -132,11 +137,16 @@ int main(int argc, char **argv) {
     printf("%s\n", search_for_label(&t, 1)); // jack
     printf("%s\n", search_for_label(&t, 101)); //testerror (Not found)
     
-    */
 
     return 0;
 
+    
+
 }
+
+*/
+
+
 
 
 
