@@ -54,12 +54,13 @@ void table_constructor(struct table *table) {
     table->first->next   = NULL;
 }
 
+/* commented out as it only worked for table t, not for any table
 void create_table(void) {
 
     table_constructor(&t);
 
 }
-
+*/
 
 void insert_elem(struct table *table, char *label, int32_t memory_address) {
 

@@ -22,7 +22,7 @@ typedef struct table_elem {
 }table_elem;
 
 
-void create_table(void);
+void table_constructor(struct table *table);
 void insert_elem(struct table *table, char *label, int32_t memory_address);
 char* search_for_label(struct table *table, int32_t memory_address);
 int32_t search_for_memory_address(struct table *table, char *label);
