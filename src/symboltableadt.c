@@ -3,8 +3,8 @@
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
-#define not_found_exception "Not found"
-#define memory_address_not_found_exception 404
+#define notFoundException "Not found"
+#define memoryAddressNotFoundException 404
 
 
 /*
@@ -22,23 +22,23 @@ Have not implemented delete - seems uneccessary for assembler
 
 
 struct table {
-    struct table_elem *first;
+    struct tableElem *first;
     int32_t size;
 };
 
 
-struct table_elem {
+struct tableElem {
     char *label;
-    int32_t memory_address;
-    struct table_elem *prev;
-    struct table_elem *next;
+    int32_t memoryAddress;
+    struct tableElem *prev;
+    struct tableElem *next;
 };
 
 struct table t;
 
-struct table_elem *table_alloc_elem(void) {
+struct tableElem *tableAllocElem(void) {
     //allocates memory for a new 'node/entry/elem' in the table
-    struct table_elem *elem = malloc(sizeof(struct table_elem));
+    struct tableElem *elem = malloc(sizeof(struct tableElem));
     if ( elem == NULL ) {
         exit(EXIT_FAILURE);
     }
@@ -46,10 +46,10 @@ struct table_elem *table_alloc_elem(void) {
 }
 
 
-void table_constructor(struct table *table) {
+void tableConstructor(struct table *table) {
 
     //initialises table
-    table->first         = table_alloc_elem();
+    table->first         = tableAllocElem();
     table->first->prev   = NULL;
     table->first->next   = NULL;
 }
@@ -57,23 +57,23 @@ void table_constructor(struct table *table) {
 /* commented out as it only worked for table t, not for any table
 void create_table(void) {
 
-    table_constructor(&t);
+    tableConstructor(&t);
 
 }
 */
 
-void insert_elem(struct table *table, char *label, int32_t memory_address) {
+void insert_elem(struct table *table, char *label, int32_t memoryAddress) {
 
     //allocate memory to new item and add its values
-    struct table_elem *new_elem = table_alloc_elem();
-    new_elem->label = label;
-    new_elem->memory_address = memory_address;
+    struct tableElem *newElem = tableAllocElem();
+    newElem->label = label;
+    newElem->memoryAddress = memoryAddress;
 
     //inserting new item at the front always
-    new_elem->next = table->first;
-    new_elem->prev = NULL;
-    table->first->prev = new_elem;
-    table->first = new_elem;
+    newElem->next = table->first;
+    newElem->prev = NULL;
+    table->first->prev = newElem;
+    table->first = newElem;
 
     //increment size of table
     table->size++;
@@ -81,38 +81,38 @@ void insert_elem(struct table *table, char *label, int32_t memory_address) {
 }
 
 
-char* search_for_label(struct table *table, int32_t memory_address) {
+char* searchForLabel(struct table *table, int32_t memoryAddress) {
  
     // retrives the label given the memory address
 
     int i = table->size;
-    struct table_elem *curr;
+    struct tableElem *curr;
     curr = table->first;
 
     while ( i > 0 ) {
-        if ( memory_address == (curr->memory_address) ) {
+        if ( memoryAddress == (curr->memoryAddress) ) {
             return (curr->label);
         } 
         curr = curr->next;
         i--;
     }
 
-    return not_found_exception;
+    return notFoundException;
 
 }
 
 
-int32_t search_for_memory_address(struct table *table, char *label) {
+int32_t searchForMemoryAddress(struct table *table, char *label) {
 
     //retrives the memory address given the label
 
     int i = table->size;
-    struct table_elem *curr;
+    struct tableElem *curr;
     curr = table->first;
 
     while ( i > 0 ) {
         if ( strcmp(label, curr->label) == 0 ) { // if strings are equal this outputs 0 for some reason 
-            return (curr->memory_address);
+            return (curr->memoryAddress);
         } 
         curr = curr->next;
         i--;
@@ -132,11 +132,11 @@ int main(int argc, char **argv) {
     insert_elem(&t, "Joel", 5);
     insert_elem(&t, "Jack", 1);
     
-    printf("%i\n", search_for_memory_address(&t, "Denise")); //100
-    printf("%i\n", search_for_memory_address(&t, "Zues")); // 99
-    printf("%i\n", search_for_memory_address(&t, "Joe")); //testerror (404)
-    printf("%s\n", search_for_label(&t, 1)); // jack
-    printf("%s\n", search_for_label(&t, 101)); //testerror (Not found)
+    printf("%i\n", searchForMemoryAddress(&t, "Denise")); //100
+    printf("%i\n", searchForMemoryAddress(&t, "Zues")); // 99
+    printf("%i\n", searchForMemoryAddress(&t, "Joe")); //testerror (404)
+    printf("%s\n", searchForLabel(&t, 1)); // jack
+    printf("%s\n", searchForLabel(&t, 101)); //testerror (Not found)
     
 
     return 0;

@@ -9,23 +9,23 @@
 
 
 typedef struct table {
-    struct table_elem *first;
+    struct tableElem *first;
     int32_t size;
 }table;
 
 
-typedef struct table_elem {
+typedef struct tableElem {
     char *label;
-    int32_t memory_address;
-    struct table_elem *prev;
-    struct table_elem *next;
-}table_elem;
+    int32_t memoryAddress;
+    struct tableElem *prev;
+    struct tableElem *next;
+}tableElem;
 
 
-void table_constructor(struct table *table);
-void insert_elem(struct table *table, char *label, int32_t memory_address);
-char* search_for_label(struct table *table, int32_t memory_address);
-int32_t search_for_memory_address(struct table *table, char *label);
+void tableConstructor(struct table *table);
+void insertElem(struct table *table, char *label, int32_t memoryAddress);
+char* searchForLabel(struct table *table, int32_t memoryAddress);
+int32_t searchForMemoryAddress(struct table *table, char *label);
 
 
 

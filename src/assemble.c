@@ -4,8 +4,8 @@
 #include "symboltableadt.h"
 
 
-table symbol_table;
-table instruction_table;
+table symbolTable;
+table instructionTable;
 
 void writeBinary(char *path, uint32_t write){
     //This takes one uint32_t at a time, and appends it to the
@@ -54,8 +54,8 @@ int main(int argc, char **argv) {
     char currLine[size];
     FILE *fp;
     
-    table_constructor(&symbol_table);
-    table_constructor(&instruction_table);
+    tableConstructor(&symbolTable);
+    tableConstructor(&instructionTable);
     
     if ((fp = fopen(srcpath, "r")) == NULL) {
             perror("Error opening file.txt!");
@@ -71,9 +71,9 @@ int main(int argc, char **argv) {
       nmonic = getNmonic(currLine);
       if (nmonic[strlen(nmonic) - 1] == ':') {
           printf("symbol table insertion, 
-          insert_elem(&symbol_table, nmonic, i);
+          insertElem(&symbolTable, nmonic, i);
       } else {
-          insert_elem(&instruction_table, currLine,i++);
+          insertElem(&instructionTable, currLine,i++);
       }
       
       printf("%s\n", nmonic);
@@ -82,10 +82,10 @@ int main(int argc, char **argv) {
     if (currLine[strlen(currLine) - 1] == '\n') currLine[strlen(currLine) - 1] = '\0';
       if (currLine[strlen(currLine) -1] == ':') {
           printf("symbol table ins, (%s), %d\n", currLine, i*4);
-          insert_elem(&symbol_table, currLine, i);
+          insertElem(&symbolTable, currLine, i);
       } else {
           printf("instruction tab ins, (%s), %d\n", currLine, i*4);
-          insert_elem(&instruction_table, currLine,i++);
+          insertElem(&instructionTable, currLine,i++);
       }
       
      //printf("%s\n", currLine);
