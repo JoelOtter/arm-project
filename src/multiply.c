@@ -33,15 +33,10 @@ static void setFlagsMultiply(uint32_t result, uint32_t S) {
     uint32_t cpsrMask = generateMask(30);
     cpsr &= cpsrMask;
 
-    //printf("N    = "); printBits(N);
-    //printf("Z    = "); printBits(Z);
-    //printf("cpsr = "); printBits(cpsr);
     cpsr |= N | Z;
-    //printf("cpsr = "); printBits(cpsr);
 
     registers[16] = cpsr;
    }
-
 }
 
 void multiply(uint32_t instruction) {
@@ -53,7 +48,6 @@ void multiply(uint32_t instruction) {
     uint32_t S = (instruction >> 20) & mask1;
 
     uint32_t temp = registers[Rm] * registers[Rs];
-    //printf("%u\n%u\n%u\n", registers[Rm], registers[Rs], temp);
 
     // if accumulate bit is set, then also add value of Rn
     if ((instruction >> 21) & mask1) {

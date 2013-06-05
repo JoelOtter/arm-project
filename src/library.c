@@ -11,10 +11,11 @@ const uint32_t mask4 =  15; // 0000 1111
 const uint32_t mask5 =  31; // 0001 1111
 const uint32_t mask8 = 255; // 1111 1111 
 const int SIZE_OF_MEMORY = 65536;
+const int NUM_REGISTERS = 17;
 
 int carryout;
 
-uint32_t get_from_memory(unsigned char *memory, int start) {
+uint32_t getFromMemory(unsigned char *memory, int start) {
 
     uint32_t p1 = memory[start+3] << 24;
     uint32_t p2 = memory[start+2] << 16;
@@ -31,7 +32,7 @@ void writeToMemory(unsigned char *memory, int start, uint32_t value) {
     memory[start] = value;
 }
 
-void print_registers(int *registers){
+void printRegisters(int *registers){
 
     printf("Registers:\n");
     printf("$0  : %10d (0x%08x)\n", registers[0],registers[0]);
@@ -49,7 +50,6 @@ void print_registers(int *registers){
     printf("$12 : %10d (0x%08x)\n", registers[12],registers[12]);
     printf("PC  : %10d (0x%08x)\n", registers[15],registers[15]);
     printf("CPSR: %10d (0x%08x)\n", registers[16],registers[16]);
-
 }
 
 void printBits(uint32_t x) {
@@ -118,7 +118,6 @@ uint32_t logShiftRight(uint32_t value, uint32_t scale) {
     }
     value >>= scale;
     return value;
-
 }
 
 uint32_t arithShiftRight(uint32_t value, uint32_t scale) {
@@ -138,7 +137,6 @@ uint32_t arithShiftRight(uint32_t value, uint32_t scale) {
         value |= mask;
     }
     return value;
-
 }
 
 uint32_t rotateRight(uint8_t rotate, uint32_t value){
@@ -167,7 +165,7 @@ uint32_t rotateRight(uint8_t rotate, uint32_t value){
     return (result);    
 }
 
-int SignExtend(int value, int length){
+int signExtend(int value, int length){
 
     uint32_t sign = value >> (length - 1);    //Gets most significant bit, the sign!!
     uint32_t extension = 32 - length;    
@@ -185,5 +183,4 @@ int SignExtend(int value, int length){
         value |= mask;
     }
     return value;
-
 }

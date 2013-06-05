@@ -21,12 +21,12 @@ uint32_t arithShiftRight(uint32_t value, uint32_t scale);
 
 uint32_t rotateRight(uint8_t rotate, uint32_t value);
 
-int SignExtend(int value, int length);
+int signExtend(int value, int length);
 
-uint32_t get_from_memory(unsigned char *memory, int start);
+uint32_t getFromMemory(unsigned char *memory, int start);
 
 void writeToMemory(unsigned char *memory, int start, uint32_t value);
 
-void print_registers(int *registers);
+void printRegisters(int *registers);
 
 #endif

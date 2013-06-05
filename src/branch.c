@@ -14,7 +14,7 @@ static int getOffset(uint32_t instruction){
     
     uint32_t mask24 = generateMask(24); //Generate's mask of length 24; bit 23- bit0
     int offset = instruction & mask24;  //Get mask
-    offset = SignExtend(offset, 24);    
+    offset = signExtend(offset, 24);    
     offset <<= 2;                       //Shift offset to the left by 2.
     
     return offset; 

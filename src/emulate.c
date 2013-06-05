@@ -12,36 +12,29 @@
 unsigned char *memory;
 int32_t *registers;
 
-static void loadbinary(const char *filepath);
+static void loadBinary(const char *filepath);
 
 static int checkCondition(uint32_t instruction);
 
 static enum instructionType decode(uint32_t instruction);
 
-void print_memory(void);
+void printMemory(void);
 
 void printNonZeroMemory(void);
 
 int main(int argc, char **argv) {
 
     memory = calloc(SIZE_OF_MEMORY, sizeof(char));
-    registers = calloc(17, sizeof(int32_t));
+    registers = calloc(NUM_REGISTERS, sizeof(int32_t));
 
     assert(argc == 2);
 
-    //print_memory();
-
-    loadbinary(argv[1]);
-
-    //print_memory();
-
-    //DO we need to initialise the registers to 0 explicitly????
+    loadBinary(argv[1]);
     int32_t *PC = &registers[15];
     *PC = 8;
-    uint32_t fetched = get_from_memory(memory, 4);
-    //printf("Fetched instr: "); printBits(fetched);
-    uint32_t decoded = get_from_memory(memory, 0);
-    enum instructionType current_Inst_Type = decode(decoded);
+    uint32_t fetched = getFromMemory(memory, 4);
+    uint32_t decoded = getFromMemory(memory, 0);
+    enum instructionType currentInstType = decode(decoded);
     int skipToNext = 0;
 
     while(decoded != 0){
@@ -50,15 +43,15 @@ int main(int argc, char **argv) {
 
         // If condition is satisfied, execute current instruction!
         if(checkCondition(decoded)){
-            switch(current_Inst_Type){
+            switch(currentInstType){
                 case(DATA_PROCESSING):
-                    data_Process(decoded);
+                    dataProcess(decoded);
                 break;
                 case(BRANCH):
                     branch(decoded);
-                    fetched = get_from_memory(memory, *PC + 4);
-                    decoded = get_from_memory(memory, *PC);
-                    current_Inst_Type = decode(decoded);
+                    fetched = getFromMemory(memory, *PC + 4);
+                    decoded = getFromMemory(memory, *PC);
+                    currentInstType = decode(decoded);
                     *PC += 8;
                     skipToNext = 1;
                 break;
@@ -66,7 +59,7 @@ int main(int argc, char **argv) {
                     multiply(decoded);
                 break;
                 case(SINGLE_DATA_TRANSFER):
-                    single_data_transfer(decoded);
+                    singleDataTransfer(decoded);
                 break;
              }        
         } 
@@ -74,25 +67,25 @@ int main(int argc, char **argv) {
         if (skipToNext) continue;
 
         //Decode the fetched instruction.
-        current_Inst_Type = decode(fetched);
+        currentInstType = decode(fetched);
         decoded = fetched;
 
         //Fetch new instruction
-        fetched = get_from_memory(memory, *PC);
+        fetched = getFromMemory(memory, *PC);
 
         //Increment PC to next instruction
         *PC += 4; 
 
     }
 
-    print_registers(registers);
+    printRegisters(registers);
     printNonZeroMemory();
 
     free(memory);
     free(registers);
 }
 
-static void loadbinary(const char *filepath) {
+static void loadBinary(const char *filepath) {
 
     // should malloc fail, print error message and return failure
     if (memory == NULL) {
@@ -129,8 +122,6 @@ static int checkCondition(uint32_t instruction) {
     uint32_t condNumber = mask4 & (instruction >> 28);
     int condflag = 0;
 
-    //printf("instruction = %x\n", instruction);
-    //printf("Con Num = %x\n", condNumber);
     switch(condNumber) {
 
         case(0):
@@ -162,10 +153,8 @@ static int checkCondition(uint32_t instruction) {
             condflag = 1;
             break;
     }
-    //printf("ConditionFlag = %x\n", condflag);
     return condflag;
 }
-
 
 static enum instructionType decode(uint32_t instruction){ //Instruction is 32 bits
 
@@ -214,11 +203,9 @@ static enum instructionType decode(uint32_t instruction){ //Instruction is 32 bi
 
 }  
 
-
-
 // Functions for testing!!!
 
-void print8bits(uint8_t x) {
+void print8Bits(uint8_t x) {
     
     int i;
 
@@ -236,22 +223,12 @@ void print8bits(uint8_t x) {
     printf("\n");
 }
 
-
-
-void print_memory(void){
-    for(int x = 0; x < 12; x++){
-        if((x % 4) == 0){printf("\n");}
-        printf("Memory[%d] =\t ", x); print8bits(memory[x]);
-    }
-    printf("\n");
-}
-
 void printNonZeroMemory(void) {
     printf("Non-zero memory:\n");
     for (int i = 0; i< 65536; i+=4) {
-        uint32_t memoryThing = get_from_memory(memory, i);
-        if (memoryThing != 0) {
-            printf("0x%08x: 0x%08x\n", i, memoryThing);
+        uint32_t memoryContent = getFromMemory(memory, i);
+        if (memoryContent != 0) {
+            printf("0x%08x: 0x%08x\n", i, memoryContent);
         }
     }
 }

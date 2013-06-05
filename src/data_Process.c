@@ -93,11 +93,8 @@ static int32_t getOperand2(uint32_t instruction) {
                 result = rotateRight(rmValue, scale);
                 break;
         }
-
     }
-
     return result;
-
 }
 
 
@@ -112,30 +109,19 @@ static void setFlags(int32_t result, uint32_t S) {
     uint32_t N = result & (1 << 31); 
     // Set Z if result is zero
     uint32_t Z = (result == 0) << 30 ;
-    //printf("(Result == 0) = %d\n", (result == 0));
     // Set carry out
     uint32_t C = carryout << 29 ;
 
     uint32_t csprMask = generateMask(28);
     cspr &= csprMask;
-
-    //printf("N    = "); printBits(N);
-    //printf("Z    = "); printBits(Z);
-    //printf("C    = "); printBits(C);
-    //printf("cpsr = "); printBits(cspr);
     cspr |= N | Z | C;
-    //printf("cpsr = "); printBits(cspr);
-
     registers[16] = cspr;
    }
-
-
-
 }
 
 
 
-void data_Process(uint32_t instruction) {
+void dataProcess(uint32_t instruction) {
 
     enum opcodeType op = getOpcode(instruction);
 
@@ -146,7 +132,6 @@ void data_Process(uint32_t instruction) {
     int32_t result = registers[destinationRegister];
     int32_t tempResult;
 
-    //printf("S = %d\n", S);
     switch(op){
 
         case(AND): result = (operand1 & operand2); setFlags(result, S); break;
@@ -162,9 +147,5 @@ void data_Process(uint32_t instruction) {
         case(ORR): result = (operand1 | operand2); setFlags(result, S); break;
         case(MOV): result = operand2              ; setFlags(result, S); break;
     }
-
     registers[destinationRegister] = result;
-
-
-
 }

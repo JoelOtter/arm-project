@@ -5,6 +5,7 @@
 extern unsigned char *memory;
 extern int *registers;
 extern const int SIZE_OF_MEMORY;
+extern const int NUM_REGISTERS;
 
 //ENUMS
 enum instructionType    {DATA_PROCESSING,
@@ -15,13 +16,5 @@ enum instructionType    {DATA_PROCESSING,
 //METHODS
 
 int main(int argc, char **argv);
-
-/*static void loadbinary(const char *filepath);
-
-static int checkCondition(uint32_t instruction);
-
-static enum instructionType decode(uint32_t instruction);
-
-*/
 
 #endif
