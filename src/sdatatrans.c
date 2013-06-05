@@ -6,7 +6,6 @@
 #include "emulate.h"
 #include "library.h"
 
-//Blatantly thieved from dataProcessing_idea.c
 
 static uint32_t getOperand2(uint32_t instruction) {
     //Operand2 is either immediate (in which case we just take the value and extend)
@@ -61,7 +60,7 @@ static void load(uint32_t P, uint32_t U, uint32_t offset, uint32_t baseReg, uint
     if (!U) offsetNew = offsetNew * (-1);
     uint32_t regValue = registers[baseReg];
     if (P) regValue += offsetNew;
-    if (regValue + 3 < SIZE_OF_MEMORY) registers[destReg] = get_from_memory(memory, regValue);
+    if (regValue + 3 < SIZE_OF_MEMORY) registers[destReg] = getFromMemory(memory, regValue);
     else printf("Error: Out of bounds memory access at address 0x%08x\n", regValue);
     if (!P) registers[baseReg] += offsetNew;
 }
@@ -76,7 +75,7 @@ static void store(uint32_t P, uint32_t U, uint32_t offset, uint32_t baseReg, uin
     if (!P) registers[baseReg] += offsetNew;
 }
 
-void single_data_transfer(uint32_t instruction){
+void singleDataTransfer(uint32_t instruction){
     uint32_t P = ((instruction >> 24) & mask1);
     uint32_t U = ((instruction >> 23) & mask1);
     uint32_t L = ((instruction >> 20) & mask1);
