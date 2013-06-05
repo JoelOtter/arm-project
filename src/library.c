@@ -184,3 +184,24 @@ int signExtend(int value, int length){
     }
     return value;
 }
+
+int regFromString(char *rstring){
+    if (rstring[0] == '['){
+        return regFromString(&rstring[1]);
+    }
+    char value[5];
+    sscanf(rstring, "r%s", value);
+    return (atoi(value));
+}
+
+int isImmediate(char *rstring){
+    return !(rstring[0] == '[');
+}
+
+int checkIfHasComma(char *address){
+    int i = 0;
+    while (address[i] != '\0'){
+        if (address[i++] == ',') return 1;
+    }
+    return 0;
+}

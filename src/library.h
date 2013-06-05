@@ -29,4 +29,10 @@ void writeToMemory(unsigned char *memory, int start, uint32_t value);
 
 void printRegisters(int *registers);
 
+int regFromString(char *rstring);
+
+int hasComma(char *address);
+
+int isImmediate(char *rstring);
+
 #endif
