@@ -23,4 +23,10 @@ uint32_t rotateRight(uint8_t rotate, uint32_t value);
 
 int SignExtend(int value, int length);
 
+uint32_t get_from_memory(unsigned char *memory, int start);
+
+void writeToMemory(unsigned char *memory, int start, uint32_t value);
+
+void print_registers(int *registers);
+
 #endif

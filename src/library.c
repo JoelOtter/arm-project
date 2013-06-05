@@ -10,8 +10,47 @@ const uint32_t mask2 =   3; // 0000 0011
 const uint32_t mask4 =  15; // 0000 1111 
 const uint32_t mask5 =  31; // 0001 1111
 const uint32_t mask8 = 255; // 1111 1111 
+const int SIZE_OF_MEMORY = 65536;
 
 int carryout;
+
+uint32_t get_from_memory(unsigned char *memory, int start) {
+
+    uint32_t p1 = memory[start+3] << 24;
+    uint32_t p2 = memory[start+2] << 16;
+    uint32_t p3 = memory[start+1] << 8;
+    uint32_t p4 = memory[start];
+
+    return (p1 | p2 | p3 | p4);
+}
+
+void writeToMemory(unsigned char *memory, int start, uint32_t value) {
+    memory[start+3] = value >> 24;
+    memory[start+2] = value >> 16;
+    memory[start+1] = value >> 8;
+    memory[start] = value;
+}
+
+void print_registers(int *registers){
+
+    printf("Registers:\n");
+    printf("$0  : %10d (0x%08x)\n", registers[0],registers[0]);
+    printf("$1  : %10d (0x%08x)\n", registers[1],registers[1]);
+    printf("$2  : %10d (0x%08x)\n", registers[2],registers[2]);
+    printf("$3  : %10d (0x%08x)\n", registers[3],registers[3]);
+    printf("$4  : %10d (0x%08x)\n", registers[4],registers[4]);
+    printf("$5  : %10d (0x%08x)\n", registers[5],registers[5]);
+    printf("$6  : %10d (0x%08x)\n", registers[6],registers[6]);
+    printf("$7  : %10d (0x%08x)\n", registers[7],registers[7]);
+    printf("$8  : %10d (0x%08x)\n", registers[8],registers[8]);
+    printf("$9  : %10d (0x%08x)\n", registers[9],registers[9]);
+    printf("$10 : %10d (0x%08x)\n", registers[10],registers[10]);
+    printf("$11 : %10d (0x%08x)\n", registers[11],registers[11]);
+    printf("$12 : %10d (0x%08x)\n", registers[12],registers[12]);
+    printf("PC  : %10d (0x%08x)\n", registers[15],registers[15]);
+    printf("CPSR: %10d (0x%08x)\n", registers[16],registers[16]);
+
+}
 
 void printBits(uint32_t x) {
     
@@ -65,6 +104,7 @@ uint32_t generateMask(uint32_t length){
 uint32_t logShiftLeft(uint32_t value, uint32_t scale) {
 
     carryout = (value >> (32 - scale)) & mask1;
+    if (scale == 0) carryout = 0;
     value <<= scale;
     return value;
 

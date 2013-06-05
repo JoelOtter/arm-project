@@ -35,7 +35,6 @@ static uint32_t getOperand2(uint32_t instruction) {
         uint32_t shiftType = mask2 & (shift >> 1); //  - shift type shift(6 -5)
         uint32_t scale   = mask5 & (shift >> 3); //  - integer    shift(11-7)
         uint32_t rm    = mask4 & instruction;      // rm      instruction(3 -0)
-        
         uint32_t rmValue = registers[rm];
         switch(shiftType) {
             case(0): 
@@ -62,7 +61,8 @@ static void load(uint32_t P, uint32_t U, uint32_t offset, uint32_t baseReg, uint
     if (!U) offsetNew = offsetNew * (-1);
     uint32_t regValue = registers[baseReg];
     if (P) regValue += offsetNew;
-    registers[destReg] = memory[regValue];
+    if (regValue + 3 < SIZE_OF_MEMORY) registers[destReg] = get_from_memory(memory, regValue);
+    else printf("Error: Out of bounds memory access at address 0x%08x\n", regValue);
     if (!P) registers[baseReg] += offsetNew;
 }
 
@@ -71,7 +71,8 @@ static void store(uint32_t P, uint32_t U, uint32_t offset, uint32_t baseReg, uin
     if (!U) offsetNew = offsetNew * (-1);
     uint32_t regValue = registers[baseReg];
     if (P) regValue += offsetNew;
-    memory[registers[destReg]] = regValue;
+    if (regValue + 3 < SIZE_OF_MEMORY) writeToMemory(memory, regValue, registers[destReg]);
+    else printf("Error: Out of bounds memory access at address 0x%08x\n", regValue);
     if (!P) registers[baseReg] += offsetNew;
 }
 
@@ -86,3 +87,4 @@ void single_data_transfer(uint32_t instruction){
     if (L) load(P, U, offset, baseReg, destReg);
     else store(P, U, offset, baseReg, destReg);
 }
+
