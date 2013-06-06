@@ -26,10 +26,10 @@ branch.o: branch.c branch.h emulate.h library.h
 library.o: library.c library.h
 		$(CC) $(CFLAGS) $< -c -o $@
 
-assemble: assemble.o symboltableadt.o ass_multiply.o ass_branch.o ass_special.o library.o
+assemble: assemble.o symboltableadt.o ass_multiply.o ass_branch.o ass_special.o ass_data_transfer.o library.o
 		$(CC) $^ -o $@
 
-assemble.o: assemble.c assemble.h symboltableadt.h ass_multiply.h ass_special.h ass_branch.h
+assemble.o: assemble.c assemble.h symboltableadt.h ass_multiply.h ass_special.h ass_branch.h ass_data_transfer.h
 		$(CC) $(CFLAGS) $< -c -o $@
 
 symboltableadt.o: symboltableadt.c symboltableadt.h
@@ -44,6 +44,9 @@ ass_branch.o: ass_branch.c ass_branch.h assemble.h library.h symboltableadt.h
 ass_special.o: ass_special.c ass_special.h library.h
 		$(CC) $(CFLAGS) $< -c -o $@
 
+ass_data_transfer.o: ass_data_transfer.c ass_data_transfer.h library.h assemble.h symboltableadt.h
+		$(CC) $(CFLAGS) $< -c -o $@    
+
 .SUFFIXES: .c .o
 
 .PHONY: all clean
@@ -54,6 +57,6 @@ clean:
 	rm -f assemble
 	rm -f emulate 
 	rm -f emulate.o multiply.o data_process.o sdatatrans.o branch.o library.o
-	rm -f assemble.o symboltableadt.o ass_multiply.o ass_branch.o ass_special.o library.o
+	rm -f assemble.o symboltableadt.o ass_multiply.o ass_branch.o ass_special.o library.o ass_data_transfer.o
 
 

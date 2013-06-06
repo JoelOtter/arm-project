@@ -35,7 +35,7 @@ uint32_t directRegister(uint32_t rd, uint32_t rn, int load){
 
 uint32_t placeAtEnd(uint32_t rd, uint32_t value, int load){
     int numIn = 0;
-    for (int i=0; add_afters[i] != 0; i+4){
+    for (int i=0; add_afters[i] != 0; i+=4){
         ++numIn;
     }
     add_afters[numIn] = value;
@@ -65,7 +65,7 @@ uint32_t preOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load){
     return result;
 }
 
-uint32_t dataTransfer(char *given, int place){
+uint32_t ass_data_transfer(char *given, int place){
     char mnemonic[5];
     char args[20];
     sscanf(given, "%[^','],%s", mnemonic, args);
@@ -74,7 +74,7 @@ uint32_t dataTransfer(char *given, int place){
     sscanf(args, "%[^','],%s", rdStr, address);
     int rd = regFromString(rdStr);
     int load = 1;
-    if (mnemonic == "str") load = 0;
+    if (!strcmp(mnemonic, "str")) load = 0;
     if (address[0] == '='){
         uint32_t loc = strToHex(address);
         if (loc <= 0xff) return doMov(rd, loc);
@@ -87,6 +87,13 @@ uint32_t dataTransfer(char *given, int place){
             sscanf(address, "%[^','],%s", preReg, preOff);
             return preOffset(rd, regFromString(preReg), atoi(&preOff[1]), load);
         }
-        else return directRegister(rd, regFromString(address), load);
+        
     }
+    
+    return directRegister(rd, regFromString(address), load);
+    
 }
+
+
+
+

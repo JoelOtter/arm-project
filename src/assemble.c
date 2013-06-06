@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+#include "ass_data_transfer.h"
 #include "symboltableadt.h"
 #include "library.h"
 #include "ass_multiply.h"
@@ -132,7 +133,7 @@ int main(int argc, char **argv) {
                  *result = ass_multiply(currLine);
                 break;
             case(SINGLE_DATA_TRANSFER):
-                //ass_single_data_transfer(currLine);
+                *result = ass_data_transfer(currLine, iter->memory_address);
                 break;
             case(BRANCH):
                 *result = ass_branch(currLine);
