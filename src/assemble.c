@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "symboltableadt.h"
+#include "ass_multiply.h"
 
 void writeBinary(char *path, uint32_t *write){
     FILE *fp;

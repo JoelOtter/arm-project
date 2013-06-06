@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
+#include "ass_multiply.h"
 #include "library.h"
 
 uint32_t assMultiply(char *mnemonic, char *rest) {
@@ -10,7 +12,7 @@ uint32_t assMultiply(char *mnemonic, char *rest) {
 
     uint32_t result = (111 << 29) | (1 << 4) | (1 << 7);
 
-    if (mnemonic == "mul") {
+    if (strcmp(mnemonic,"mul") == 0) {
         sscanf(rest, "%[^','],%[^','],%s", Rd, Rm, Rs);
         RnI = 0;
     } else {
