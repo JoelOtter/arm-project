@@ -3,33 +3,10 @@
 #include <stdio.h>
 #include "symboltableadt.h"
 
-
-void writeBinary(char *path, char *write){
+void writeBinary(char *path, uint32_t *write){
     FILE *fp;
-    int k = 3;
-    int zeroHit = 0;
-    int zero = 0;
-
-    fp = fopen(path, "wb");
-    while(1) {
-        if (write[k] == 0){
-            fwrite(&zero, sizeof(char), 1, fp);
-            zeroHit = 1;
-        }
-        else {
-            fwrite(&write[k], sizeof(write[k]), 1, fp);
-        }
-        if (k % 4 == 0 && zeroHit) break;
-        else if (k % 4 == 0) k += 7;
-        else --k;
-    }
-}
-
-char* getNmonic(char *instruction){
-    
-    char *nmonic = malloc(15);
-    sscanf(instruction, "%s", nmonic);
-    return nmonic;
+    fp = fopen(path, "ab");
+    fwrite(&write, sizeof(uint32_t), 1, fp);
 }
 
 int main(int argc, char **argv) {
