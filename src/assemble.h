@@ -3,6 +3,7 @@
 
 extern table symbol_table;
 extern table instruction_table;
+extern uint32_t *add_afters;
 
 void writeBinary(char *path, char *write);
 

@@ -21,6 +21,8 @@ enum instructionType    {DATA_PROCESSING,
 char * dataProcessingOpcodes[] = { "add", "sub", "rsb", "and", "eor", "orr",
                          "mov", "tst", "teq", "cmp" };
 
+uint32_t *add_afters;
+
 //needed for getInstruction type
 int isElemOf(char *searchString, char * list[] ) {
 
@@ -101,6 +103,9 @@ int main(int argc, char **argv) {
             i+=4;
         }     
     }
+
+    //SECOND PASS
+    add_afters = calloc(4 * (&instruction_table)->size, sizeof(uint32_t));
 
     char nmonic[10];
     char rest[50];
