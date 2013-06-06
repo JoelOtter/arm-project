@@ -1,13 +1,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include "library.h"
+#include "ass_special.h"
 
 // mov is 1001, cond is 1110 (always)
 
-uint32_t assSpecial(char *mnemonic, char *rest) {
+uint32_t ass_special(char *instruction) {
 
-    if (mnemonic == "andeq") {
+    char *mnemonic = get_mnemonic(instruction);
+    char *rest = get_rest(instruction);
+
+    if (!strcmp(mnemonic, "andeq")) {
         printf("ANDEQ\n");
         return 0;
     } else {
@@ -29,10 +34,11 @@ uint32_t assSpecial(char *mnemonic, char *rest) {
 }
 
 
-
+/*
 int main(int argc, char const *argv[])
 {
     assSpecial("andeq", "r0,r0,r0");
     assSpecial("lsl", "r1,#0x1f");
     return 0;
 }
+*/

@@ -5,7 +5,10 @@
 #include "ass_multiply.h"
 #include "library.h"
 
-uint32_t assMultiply(char *mnemonic, char *rest) {
+uint32_t ass_multiply(char *instruction) {
+
+    char *mnemonic = get_mnemonic(instruction);
+    char *rest = get_rest(instruction);
 
     char Rd[2], Rm[2], Rs[2], Rn[2];
     uint32_t RdI, RmI, RsI, RnI;

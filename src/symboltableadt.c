@@ -160,7 +160,7 @@ int32_t get_memory_address(struct table *table, char *label) {
     //retrives the memory address given the label
 
     for(table_iter iter = table_begin(table); iter != table_end(table); iter = table_iter_next(iter)){
-        if(table_iter_label(iter) == label){
+        if(!(strcmp(table_iter_label(iter), label))){
             return iter->memory_address;
         }
     }

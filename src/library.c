@@ -15,6 +15,19 @@ const int NUM_REGISTERS = 17;
 
 int carryout;
 
+char *get_mnemonic(char *instruction){
+    char *result = malloc(30);
+    sscanf(instruction, "%s", result);
+    return result;
+}
+
+char *get_rest(char *instruction){
+    char *result = malloc(5);
+    sscanf(instruction, "%*s %s", result);
+    return result;
+}
+
+
 uint32_t getFromMemory(unsigned char *memory, int start) {
 
     uint32_t p1 = memory[start+3] << 24;
@@ -198,7 +211,7 @@ int isImmediate(char *rstring){
     return !(rstring[0] == '[');
 }
 
-int hasComma(char *address){
+int checkIfHasComma(char *address){
     int i = 0;
     while (address[i] != '\0'){
         if (address[i++] == ',') return 1;

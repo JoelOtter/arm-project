@@ -9,6 +9,10 @@ extern const uint32_t mask8;
 
 extern int carryout;
 
+char *get_mnemonic(char *instruction);
+
+char *get_rest(char *instruction);
+
 void printBits(uint32_t x);
 
 uint32_t generateMask(uint32_t length);
