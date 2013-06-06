@@ -198,7 +198,7 @@ int isImmediate(char *rstring){
     return !(rstring[0] == '[');
 }
 
-int checkIfHasComma(char *address){
+int hasComma(char *address){
     int i = 0;
     while (address[i] != '\0'){
         if (address[i++] == ',') return 1;
