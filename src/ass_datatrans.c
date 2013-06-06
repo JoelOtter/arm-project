@@ -31,8 +31,8 @@ uint32_t directRegister(uint32_t rd, uint32_t rn, int load){
     return result;
 }
 
-uint32_t placeAtEnd(uint32_t rd, uint32_t location){
-    //TODO!
+uint32_t placeAtEnd(uint32_t rd, uint32_t value){
+    
 }
 
 uint32_t preOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load){
@@ -49,7 +49,10 @@ uint32_t preOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load){
     return result;
 }
 
-uint32_t dataTransfer(char *mnemonic, char *args){
+uint32_t dataTransfer(char *given, int place){
+    char mnemonic[5];
+    char args[20];
+    sscanf(given, "%[^','],%s", mnemonic, args);
     char rdStr[15];
     char address[15];
     sscanf(args, "%[^','],%s", rdStr, address);
