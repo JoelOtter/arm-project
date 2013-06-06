@@ -26,10 +26,10 @@ branch.o: branch.c branch.h emulate.h library.h
 library.o: library.c library.h
 		$(CC) $(CFLAGS) $< -c -o $@
 
-assemble: assemble.o symboltableadt.o ass_multiply.o ass_branch.o ass_special.o ass_data_transfer.o library.o
+assemble: assemble.o symboltableadt.o ass_multiply.o ass_branch.o ass_special.o ass_data_transfer.o library.o ass_data_processing.o
 		$(CC) $^ -o $@
 
-assemble.o: assemble.c assemble.h symboltableadt.h ass_multiply.h ass_special.h ass_branch.h ass_data_transfer.h
+assemble.o: assemble.c assemble.h symboltableadt.h ass_multiply.h ass_special.h ass_branch.h ass_data_transfer.h ass_data_processing.h
 		$(CC) $(CFLAGS) $< -c -o $@
 
 symboltableadt.o: symboltableadt.c symboltableadt.h
@@ -45,7 +45,10 @@ ass_special.o: ass_special.c ass_special.h library.h
 		$(CC) $(CFLAGS) $< -c -o $@
 
 ass_data_transfer.o: ass_data_transfer.c ass_data_transfer.h library.h assemble.h symboltableadt.h
-		$(CC) $(CFLAGS) $< -c -o $@    
+		$(CC) $(CFLAGS) $< -c -o $@ 
+
+ass_data_processing.o: ass_data_processing.c ass_data_processing.h library.h
+		$(CC) $(CFLAGS) $< -c -o $@   
 
 .SUFFIXES: .c .o
 
