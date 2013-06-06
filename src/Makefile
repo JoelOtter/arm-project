@@ -23,16 +23,25 @@ branch.o: branch.c branch.h emulate.h library.h
 library.o: library.c library.h
 		$(CC) $(CFLAGS) library.c -c -o library.o
 
+assemble: assemble.o symboltableadt.o
+		$(CC) assemble.o symboltableadt.o -o assemble
+
+assemble.o: assemble.c assemble.h symboltableadt.h
+		$(CC) $(CFLAGS) assemble.c -c -o assemble.o
+
+symboltableadt.o: symboltableadt.c symboltableadt.h
+		$(CC) $(CFLAGS) symboltableadt.c -c -o symboltableadt.o
+
 .SUFFIXES: .c .o
 
 .PHONY: all clean
 
 all: assemble emulate
 
-assemble: assemble.o
 
 clean:
 	rm -f $(wildcard *.o)
 	rm -f assemble
 	rm -f emulate 
 	rm -f emulate.o multiply.o data_process.o sdatatrans.o branch.o library.o
+	rm -f assemble.o symboltableadt.o

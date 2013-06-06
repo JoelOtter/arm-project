@@ -47,6 +47,7 @@ struct table t;
 struct table_elem *table_alloc_elem(void) {
     //allocates memory for a new 'node/entry/elem' in the table
     struct table_elem *elem = malloc(sizeof(struct table_elem));
+    elem->label = malloc(512);
     if ( elem == NULL ) {
         exit(EXIT_FAILURE);
     }
@@ -54,6 +55,7 @@ struct table_elem *table_alloc_elem(void) {
 }
 
 void table_free_elem(struct table_elem *elem) {
+    free(elem->label);
     free(elem);
 }
 
@@ -74,6 +76,7 @@ static void insert_elem(struct table *table, table_iter iter, char *label, uint3
     //allocate memory to new item and add its values
     struct table_elem *new_elem = table_alloc_elem();
     new_elem->memory_address = memory_address;
+    //*(new_elem->label) = *label;
     strcpy(new_elem->label,label);
     //printf("%s\n",copy);
     
@@ -177,7 +180,7 @@ void table_destroy(struct table *table){
 
 void print_table_elem(struct table_elem *table_elem) {
 
-    printf("[ Label: %s , Address: %i ]\n", table_elem->label, table_elem->memory_address);
+    printf("[ Label: %s \t Address: %i ]\n", table_elem->label, table_elem->memory_address);
 
 }
  

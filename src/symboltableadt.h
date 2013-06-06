@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <string.h>
 
+
 typedef struct table {
     struct table_elem *header;
     struct table_elem *footer;
@@ -15,14 +16,13 @@ typedef struct table {
 
 
 typedef struct table_elem {
-    char label[512];
+    char *label;
     uint32_t memory_address;
     struct table_elem *prev;
     struct table_elem *next;
 }table_elem;
 
 typedef struct table_elem *table_iter;
-
 
 void table_constructor(struct table *table);
 
