@@ -2,6 +2,9 @@ CC      = gcc
 CFLAGS  = -Wall -g -D_POSIX_SOURCE -D_BSD_SOURCE -std=c99 -Werror -pedantic
 
 #Build rule for final target (emulate)
+
+all: assemble emulate
+
 emulate: emulate.o multiply.o data_Process.o branch.o sdatatrans.o library.o
 		$(CC) $^ -o $@
 
@@ -23,7 +26,7 @@ branch.o: branch.c branch.h emulate.h library.h
 library.o: library.c library.h
 		$(CC) $(CFLAGS) $< -c -o $@
 
-assemble: assemble.o symboltableadt.o ass_multiply.o
+assemble: assemble.o symboltableadt.o ass_multiply.o library.o
 		$(CC) $^ -o $@
 
 assemble.o: assemble.c assemble.h symboltableadt.h ass_multiply.h
@@ -38,8 +41,6 @@ ass_multiply.o: ass_multiply.c ass_multiply.h library.h
 .SUFFIXES: .c .o
 
 .PHONY: all clean
-
-all: assemble emulate
 
 
 clean:
