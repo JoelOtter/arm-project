@@ -1,6 +1,8 @@
 #ifndef LIB_H
 #define LIB_H
 
+#include <string.h>
+
 extern const uint32_t mask1; 
 extern const uint32_t mask2; 
 extern const uint32_t mask4;  
@@ -38,5 +40,7 @@ int regFromString(char *rstring);
 int hasComma(char *address);
 
 int isImmediate(char *rstring);
+
+int isElemOf(char *searchString, char * list[] );
 
 #endif

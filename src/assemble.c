@@ -5,9 +5,11 @@
 #include "ass_data_transfer.h"
 #include "symboltableadt.h"
 #include "library.h"
+#include "ass_dataProcessing.h"
 #include "ass_multiply.h"
 #include "ass_branch.h"
 #include "ass_special.h"
+
 
 
 
@@ -32,23 +34,6 @@ void writeBinary(char *path, uint32_t *write){
 //needed for getInstruction type
 char * dataProcessingOpcodes[] = { "add", "sub", "rsb", "and", "eor", "orr",
                          "mov", "tst", "teq", "cmp" };
-
-//needed for getInstruction type
-int isElemOf(char *searchString, char * list[] ) {
-
-
-    int len = sizeof(searchString)/sizeof(searchString[0]);
-    int i;
-
-    for(i = 0; i < len; ++i) {
-        if(!strcmp(list[i], searchString)){
-            return 1;
-        }
-    }
-
-    return 0;
-
-}
 
 enum instructionType getInstructionType(char *opcode){ 
 
@@ -127,7 +112,7 @@ int main(int argc, char **argv) {
 
         switch(inst){
             case(DATA_PROCESSING): 
-                //ass_data_process(currLine);
+                *result = ass_data_processing(currLine);
                 break;
             case(MULTIPLY):
                  *result = ass_multiply(currLine);

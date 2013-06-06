@@ -218,3 +218,17 @@ int hasComma(char *address){
     }
     return 0;
 }
+
+int isElemOf(char *searchString, char * list[] ) {
+
+    int len = sizeof(searchString)/sizeof(searchString[0]);
+    int i;
+
+    for(i = 0; i < len; ++i) {
+        if(!strcmp(list[i], searchString)){
+            return 1;
+        }
+    }
+
+    return 0;
+}
