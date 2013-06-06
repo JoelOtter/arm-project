@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 #include "symboltableadt.h"
 #include "ass_multiply.h"
 
@@ -9,6 +10,54 @@ void writeBinary(char *path, uint32_t *write){
     fp = fopen(path, "ab");
     fwrite(&write, sizeof(uint32_t), 1, fp);
 }
+
+enum instructionType    {DATA_PROCESSING,
+                         MULTIPLY,
+                         SINGLE_DATA_TRANSFER,
+                         BRANCH,
+                         SPECIAL};
+
+//needed for getInstruction type
+char * dataProcessingOpcodes[] = { "add", "sub", "rsb", "and", "eor", "orr",
+                         "mov", "tst", "teq", "cmp" };
+
+//needed for getInstruction type
+int isElemOf(char *searchString, char * list[] ) {
+
+
+    int len = sizeof(searchString)/sizeof(searchString[0]);
+    int i;
+
+    for(i = 0; i < len; ++i) {
+        if(!strcmp(list[i], searchString)){
+            return 1;
+        }
+    }
+
+    return 0;
+
+}
+
+enum instructionType getInstructionType(char *opcode){ 
+
+    enum instructionType inst;       
+    char first = opcode[0];
+
+    if ( isElemOf(opcode, dataProcessingOpcodes) ) {
+        inst = DATA_PROCESSING;
+    } else if (first == 'm')  {
+        inst = MULTIPLY;
+    } else if ( !strcmp(opcode, "ldr") ||  !strcmp(opcode, "str") ) {
+        inst = SINGLE_DATA_TRANSFER;
+    } else if ( first == 'b' ) {
+        inst = BRANCH;
+    } else if ( !strcmp(opcode, "lsl") ||  !strcmp(opcode, "andeq") ) {
+        inst = SPECIAL;
+    }
+
+   return inst;
+
+}  
 
 int main(int argc, char **argv) {
     assert(argc == 3);
@@ -61,8 +110,19 @@ int main(int argc, char **argv) {
         sscanf(currLine, "%s %s", nmonic, rest);
         printf("Nmonic = %s\n", nmonic);
         printf("Rest = %s\n", rest);
-        //Call denise's function on nmonic to test instrucion type.
-        // Some kind of switch statment and send!        
+        
+        enum instructionType inst;
+
+        inst = getInstructionType(nmonic);
+
+        switch(inst){
+            case(DATA_PROCESSING): printf("DATA_PROCESSING\n"); break;
+            case(MULTIPLY): printf("MULTIPLY\n"); break;
+            case(SINGLE_DATA_TRANSFER): printf("SINGLE_DATA_TRANSFER\n"); break;
+            case(BRANCH): printf("BRANCH\n"); break;
+            case(SPECIAL): printf("SPECIAL\n"); break;
+        }    
+ 
     }
 
     printf("\n");
