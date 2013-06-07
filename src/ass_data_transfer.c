@@ -69,7 +69,8 @@ uint32_t doOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load, int pre){
 uint32_t ass_data_transfer(char *given, int place){
     char mnemonic[5];
     char args[20];
-    sscanf(given, "%[^','],%s", mnemonic, args);
+    sscanf(given, "%s %s", mnemonic, args);
+    printf("%s\n", mnemonic);
     char rdStr[15];
     char address[15];
     sscanf(args, "%[^','],%s", rdStr, address);
