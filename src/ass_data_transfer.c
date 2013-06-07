@@ -61,11 +61,11 @@ uint32_t placeAtEnd(uint32_t rd, uint32_t value, int load, int place){
     return result;
 }
 
-uint32_t doOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load, int pre){
+uint32_t doOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load, int pre, int imm){
     assert(offset <= 4095);
     uint32_t result = 0;
     result += (14 << 28); //cond
-    result += (2 << 25);  //01I
+    result += ((2+imm) << 25);  //01I
     result += (pre << 24);
     result += (1 << 23);  //PU
     result += (load << 20);  //L
@@ -99,11 +99,6 @@ uint32_t ass_data_transfer(char *given, int place){
  
     address = remove_leading_space(address);
 
-    printf("Address:%s\n", address);
-//  strcpy(address[1], *address[0]);   
-
-   // address = get_rest(&address);
-
     int rd = regFromString(rdStr);
     int load = 1;
 
@@ -123,12 +118,13 @@ uint32_t ass_data_transfer(char *given, int place){
     } else if (!isImmediate(address)){
         char *preReg = malloc(15);
         char *preOff = malloc(15);
-        printf("HERERERE One\n");
 
         if (has_sqb_before_comma(address)){
             sscanf(address, "%[^','],%s", preReg, preOff);
-            printf("HERERERE Two\n");
-            return doOffset(rd, regFromString(preReg), atoi(&preOff[1]), load, 0);
+            if (preOff[0] == 'r'){
+                return doOffset(rd, regFromString(preReg), atoi(&preOff[1]), load, 0, 1);
+            }
+            else return doOffset(rd, regFromString(preReg), atoi(&preOff[1]), load, 0, 0);
         }
         if (hasComma(address)){
             sscanf(address, "%[^','],%[^\n]", preReg, preOff);
@@ -138,11 +134,10 @@ uint32_t ass_data_transfer(char *given, int place){
 
  printf("preReg = %s\n", preReg);
             printf("preOff = %s\n", preOff);
-            return doOffset(rd, regFromString(preReg), atoi(&preOff[1]), load, 1);
+            return doOffset(rd, regFromString(preReg), atoi(&preOff[1]), load, 1, 0);
         }
         else return directRegister(rd, regFromString(address), load);
     }
-    printf("HERERERE Three\n");
     return 0;
 }
 
