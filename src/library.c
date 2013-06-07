@@ -248,3 +248,18 @@ int isElemOf(char *searchString, char *list[] , unsigned long int len) {
 
     return 0;
 }
+
+char* remove_leading_spaces(char *string){
+
+    while(string[0] == ' '){
+        string = &(string[1]);
+    }
+        
+    return string;
+
+}
+
+
+
+
+

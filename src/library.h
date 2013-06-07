@@ -45,4 +45,6 @@ int isElemOf(char *searchString, char *list[] , unsigned long int len);
 
 int has_sqb_before_comma(char *address);
 
+char* remove_leading_spaces(char *string);
+
 #endif

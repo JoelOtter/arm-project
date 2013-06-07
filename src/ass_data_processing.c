@@ -27,11 +27,9 @@ char Rd[2];
 char Rm[2];
 char operand2[15];
 
-
 enum dataInstructionType getType(char *mnemonic) {
 
     enum dataInstructionType inst;
-
     char first = mnemonic[0];
 
     if (first == 'm') {
@@ -49,7 +47,6 @@ enum dataInstructionType getType(char *mnemonic) {
 uint32_t getOpcode(char *mnemonic) {
 
     uint32_t opcode;
-
     char first = mnemonic[0];
     char second = mnemonic[1];
 
@@ -67,10 +64,11 @@ uint32_t getOpcode(char *mnemonic) {
     return opcode; 
 }
 
-
 int getNumZeros(uint32_t n) {
+
     int numZeros = 0;
     int firstOne = 0; 
+
     if ( n == 0 ) {
         return 32;
     } else {  
@@ -84,39 +82,37 @@ int getNumZeros(uint32_t n) {
     }
 }
 
-
 int withinKBits(uint32_t n, int k) {
 
    int numZeros = getNumZeros(n);
    numZeros++;
    n >>= numZeros;
    uint32_t mask = (((1 << (32-numZeros)) - 1) << (k-1));
+
    return !((mask & n) > 0 );
 }
-
 
 int isValidNumber(uint32_t number) {
 
     int numZeros = getNumZeros(number);
+
     return ((withinKBits(number, 8)) && !((numZeros & 1) && !(withinKBits(number, 7))));
-
-//if its not within 8bits then you wont be able to accurately reprsent it. if it has 8 bits but is in an ugly position 0001 1111 1110, it cant be used either because we can only shift by x2 multiple.
 }
-
 
 uint32_t calculateRotation(uint32_t number) {
 
-    assert(isValidNumber(number));
     uint32_t rotation;    
     int32_t numZeros = getNumZeros(number);
+
+    assert(isValidNumber(number));
     if ( number < 256 ) {
         rotation = 0;
     } else {
         if ( numZeros & 1 ) numZeros = numZeros-1;
         rotation = numZeros; // DIVIDE ME BY TWO 
     }
-    return rotation;
 
+    return rotation;
 }
 
 
@@ -127,7 +123,6 @@ uint32_t getOperand2(char *operand2) {
 
     if ( first == '#' ) {
         I = 1;
-
         if (operand2[2] == 'x') { //hex
             operand2 = operand2+3;
             operand2I = strtol(operand2, NULL, 16);
@@ -137,36 +132,121 @@ uint32_t getOperand2(char *operand2) {
         }
 
         if ( isValidNumber(operand2I)) {
+
             if (! (operand2I < 256) ) {
                 uint32_t rotation = calculateRotation(operand2I);
                 operand2I = rotateRight(rotation, operand2I);  
                 operand2I = operand2I | (((32 - rotation) >> 1) << 8 );
             }
+
         } else {
             operand2I = 0;
-            printf("Error: numeric constant cannot be represented\n");
+            perror("Error: numeric constant cannot be represented\n");
+            exit(EXIT_FAILURE);
         }
 
     } else {
         I = 0;
-        //no shift implemented yet
-        sscanf(operand2, "%s", Rm);
-        operand2I = regFromString(Rm);
-
+        if ( !is_shifted(operand2) ) {
+            operand2I = get_unshifted_register(operand2);
+        } else { 
+            operand2I = get_shifted_register(operand2);
+        }
     }
 
     return operand2I;
-
 }
 
+uint32_t get_unshifted_register(char* operand2) {
+
+    sscanf(operand2, "%s", Rm);
+    return regFromString(Rm);
+}
+
+int is_shifted(char *operand2) {
+
+     char first[30];
+     char second[30];
+     char *second2;
+
+     sscanf(operand2, "%[^','],%[^\n]", first, second);
+     second2 = (remove_leading_spaces(second));   
+ 
+     return !(second2[0] == '\0');
+}
+
+uint32_t get_shifted_register(char* operand2) {
+
+    uint32_t rmI;
+    char shift_name[5];
+    char rest[10];
+    uint32_t operand2I;
+    char *shift_name_pointer;
+    char *rest_pointer;
+    
+    sscanf(operand2, "%[^','],%s %s", Rm, shift_name, rest);
+    remove_leading_spaces(Rm);
+    shift_name_pointer = remove_leading_spaces(shift_name);
+    rest_pointer = remove_leading_spaces(rest);
+
+    if ( rest[0] == '#') {
+        operand2I = shift_immediate(shift_name_pointer, &(rest_pointer[1]));
+    } else {
+        operand2I = shift_register(shift_name_pointer, rest_pointer);
+    }
+
+    rmI = regFromString(remove_leading_spaces(Rm));
+    operand2I |= rmI;
+    
+    return operand2I;
+}
+
+uint32_t shift_immediate(char* shift_name, char* constant) {
+
+    uint32_t result = 0;
+    uint32_t immediate = atoi(constant); // might not be unsigned
+    uint32_t shift_type = get_shift_type(shift_name);
+
+    if ( immediate >=64 ) {
+        perror("Error: numeric constant cannot be represented\n");
+        exit(EXIT_FAILURE);
+    }
+
+    result = ( immediate << 7 ) | (shift_type << 5 );
+
+    return result;
+}
+
+uint32_t shift_register(char* shift_name, char* rs) {
+
+    uint32_t result = 0;
+    uint32_t rsI = regFromString(rs);
+    uint32_t shift_type = get_shift_type(shift_name);
+    
+    result = (rsI << 8 ) | (shift_type << 5) | (1 << 4);
+
+    return result;
+}
+
+uint32_t get_shift_type(char *shift_type){
+
+    if (!(strcmp(shift_type, "lsl"))) {
+        return 0;
+    } else if (!(strcmp(shift_type, "lsr") )) {
+        return 1;
+    } else if (!(strcmp(shift_type, "asr"))) {
+        return 2;
+    }
+ 
+    return 3;
+}
 
 void executeResultInst(char *mnemonic, char *rest) {
     S = 0;
-    sscanf(rest, "%[^','],%[^','],%s", Rd, Rn, operand2);
+    sscanf(rest, "%[^','],%[^','],%[^\n]", Rd, Rn, operand2);
     RdI = regFromString(Rd);
     RnI = regFromString(Rn);
 }
-
 
 void executeSingleOperandInst(char *mnemonic, char *rest) {
     S = 0;
@@ -175,37 +255,30 @@ void executeSingleOperandInst(char *mnemonic, char *rest) {
     RdI = regFromString(Rd);
 }
 
-
 void executeCPSRInst(char *mnemonic, char *rest) {
     S = 1;
-    sscanf(rest, "%[^','],%s", Rn, operand2);
+    sscanf(rest, "%[^','],%[^\n]", Rn, operand2);
     RnI = regFromString(Rn);
     RdI = 0;
 }
 
-
 uint32_t ass_data_processing(char *instruction) {
-
 
     char *mnemonic = get_mnemonic(instruction);
     char *rest = get_rest(instruction);
-
     uint32_t result;
 
     enum dataInstructionType type = getType(mnemonic);
     switch(type) {
-            case(RESULT): 
-                executeResultInst(mnemonic, rest);
-                //printf("result\n");
-                break;
-            case(SINGLE_OPERAND): 
-                executeSingleOperandInst(mnemonic, rest);
-                //printf("single\n");
-                break;
-            case(CPSR): 
-                executeCPSRInst(mnemonic, rest);
-                //printf("cpsr\n");
-                break;
+        case(RESULT): 
+            executeResultInst(mnemonic, rest);
+            break;
+        case(SINGLE_OPERAND): 
+            executeSingleOperandInst(mnemonic, rest);
+            break;
+        case(CPSR): 
+            executeCPSRInst(mnemonic, rest);
+            break;
     }    
 
     cond = 14;
@@ -213,28 +286,7 @@ uint32_t ass_data_processing(char *instruction) {
     operand2I = getOperand2(operand2);
 
     result = (cond << 28) | (I << 25) | (opcode << 21) | (S << 20) | (RnI << 16) | (RdI << 12) | operand2I ;
- 
-
-    /*
-    //Content of all the sections for testing
-    printf("\n\nContents of instruction: \n");
-    printf("cond: %d\n", cond);
-    printf("I: %d\n", I);
-    printf("opcode: %d\n", opcode);
-    printf("S: %d\n", S);
-    printf("RnI: %d\n", RnI);
-    printf("RdI: %d\n", RdI);
-    printf("operand2: %d\n", operand2I);
-    */
-    printf("result in data processing: %x\n", result);
    
-    
     return result;
-
 }
-
-
-
-
-
 
