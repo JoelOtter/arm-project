@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
  //   char rest[50];
     enum instructionType inst;
     
-    uint32_t *result = NULL;
+    uint32_t result = NULL;
     
     for(table_iter iter = table_begin(&instruction_table); iter != table_end(&instruction_table); iter = table_iter_next(iter)){
     
@@ -112,22 +112,22 @@ int main(int argc, char **argv) {
 
         switch(inst){
             case(DATA_PROCESSING): 
-                *result = ass_data_processing(currLine);
+                result = ass_data_processing(currLine);
                 break;
             case(MULTIPLY):
-                 *result = ass_multiply(currLine);
+                 result = ass_multiply(currLine);
                 break;
             case(SINGLE_DATA_TRANSFER):
-                *result = ass_data_transfer(currLine, iter->memory_address);
+                result = ass_data_transfer(currLine, iter->memory_address);
                 break;
             case(BRANCH):
-                *result = ass_branch(currLine);
+                result = ass_branch(currLine);
                 break;
             case(SPECIAL):
-                *result = ass_special(currLine);
+                result = ass_special(currLine);
                 break;
         }    
-        
+        //printf("result: %x\n", result);
         writeBinary(destpath, result);
  
     }
