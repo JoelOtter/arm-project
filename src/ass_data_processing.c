@@ -11,7 +11,8 @@ enum dataInstructionType {RESULT,
                           SINGLE_OPERAND,
                           CPSR};
 
-char * resultInstructions[] = { "add", "eor", "sub", "rsb", "and", "orr" };
+char *result_instructions[] = { "add", "eor", "sub", "rsb", "and", "orr" };
+unsigned long int result_instructions_size = (sizeof(result_instructions)/sizeof(result_instructions[0]));
 
 uint32_t cond = 0;
 uint32_t I = 0;
@@ -37,7 +38,7 @@ enum dataInstructionType getType(char *mnemonic) {
         inst = SINGLE_OPERAND;
     } else if ( first == 't' || first == 'c' )   {
         inst = CPSR;
-    } else if (isElemOf(mnemonic, resultInstructions)) {
+    } else if (isElemOf(mnemonic, result_instructions, result_instructions_size)) {
         inst = RESULT;
     }
 
@@ -185,7 +186,7 @@ void executeCPSRInst(char *mnemonic, char *rest) {
 
 uint32_t ass_data_processing(char *instruction) {
 
-    printf("%s\n", instruction);
+
     char *mnemonic = get_mnemonic(instruction);
     char *rest = get_rest(instruction);
 
