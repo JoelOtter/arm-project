@@ -41,7 +41,7 @@ int hasComma(char *address);
 
 int isImmediate(char *rstring);
 
-int isElemOf(char *searchString, char * list[] );
+int isElemOf(char *searchString, char *list[] , unsigned long int len);
 
 int has_sqb_before_comma(char *address);
 

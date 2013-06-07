@@ -233,12 +233,14 @@ int has_sqb_before_comma(char *address){
     return 0;
 }
 
-int isElemOf(char *searchString, char * list[] ) {
+int isElemOf(char *searchString, char *list[] , unsigned long int len) {
 
-    int len = sizeof(searchString)/sizeof(searchString[0]);
+  //  int len = sizeof(list);  
+    printf("%lu\n", len);
     int i;
 
     for(i = 0; i < len; ++i) {
+        
         if(!strcmp(list[i], searchString)){
             return 1;
         }

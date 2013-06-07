@@ -33,17 +33,15 @@ void writeBinary(char *path, uint32_t write){
 }
 
 //needed for getInstruction type
-char * dataProcessingOpcodes[] = { "add", "sub", "rsb", "and", "eor", "orr",
-                         "mov", "tst", "teq", "cmp" };
+char *dataProcessingOpcodes[] = { "add", "sub", "rsb", "and", "eor", "orr", "mov", "tst", "teq", "cmp" };
+unsigned long int dataPSize = (sizeof(dataProcessingOpcodes)/sizeof(dataProcessingOpcodes[0]));
 
 enum instructionType getInstructionType(char *opcode){ 
 
     enum instructionType inst;       
     char first = opcode[0];
 
-    if ( isElemOf(opcode, dataProcessingOpcodes) || !strcmp(opcode, "cmp") ) {
-        inst = DATA_PROCESSING;
-    } else if (first == 'm')  {
+    if (!strcmp(opcode, "mul") || !strcmp(opcode, "mla") )  {
         inst = MULTIPLY;
     } else if ( !strcmp(opcode, "ldr") ||  !strcmp(opcode, "str") ) {
         inst = SINGLE_DATA_TRANSFER;
@@ -51,7 +49,9 @@ enum instructionType getInstructionType(char *opcode){
         inst = BRANCH;
     } else if ( !strcmp(opcode, "lsl") ||  !strcmp(opcode, "andeq") ) {
         inst = SPECIAL;
-    }
+    } else if ( isElemOf(opcode, dataProcessingOpcodes, dataPSize) ) { //|| !strcmp(opcode, "cmp") || !strcmp(opcode, "teq") ) {
+        inst = DATA_PROCESSING;
+    } 
 
    return inst;
 
