@@ -98,9 +98,10 @@ int main(int argc, char **argv) {
             i+=4;
         }     
     }
+
+    fclose(fp);
+
     add_afters = calloc(4 * (&instruction_table)->size, sizeof(uint32_t));
- //   char nmonic[10];
- //   char rest[50];
     enum instructionType inst;
     
     uint32_t result = 0;
@@ -138,23 +139,12 @@ int main(int argc, char **argv) {
  
     }
 
+    for(int i=0; add_afters[i] != 0; i++){
+        writeBinary(destpath, add_afters[i]);
+    }
+
     printf("\n");
-
-
-    //Now for the second pass
-    //Iterate through instruction table
-    //Split instruction into nmonic and rest of instruction
-    //Work out appropriate toBinary function(data Process etc)
-    //This will return the binary
-    //Put into array?
-
-
-    //above iteration has finished
-    //Send array to joels function which will turn into little endian 
-    //and then output
-
-    //Alternatively, change to little endian before adding to array?
     
         
-    fclose(fp);
+   
 }
