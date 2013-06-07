@@ -40,7 +40,7 @@ enum instructionType getInstructionType(char *opcode){
     enum instructionType inst;       
     char first = opcode[0];
 
-    if ( isElemOf(opcode, dataProcessingOpcodes) ) {
+    if ( isElemOf(opcode, dataProcessingOpcodes) || !strcmp(opcode, "cmp") ) {
         inst = DATA_PROCESSING;
     } else if (first == 'm')  {
         inst = MULTIPLY;
@@ -90,10 +90,10 @@ int main(int argc, char **argv) {
         if (currLine[strlen(currLine) -1] == ':') {
             currLine[strlen(currLine)-1] = 0;
             printf("symbol table ins, (%s), %d\n", currLine, i);
-            table_insert_end(&symbol_table, currLine, i);
+            table_insert_front(&symbol_table, currLine, i);
         } else {
             printf("instruction table ins, (%s), %d\n", currLine, i);
-            table_insert_end(&instruction_table, currLine,i);
+            table_insert_front(&instruction_table, currLine,i);
             i+=4;
         }     
     }
@@ -103,6 +103,7 @@ int main(int argc, char **argv) {
     enum instructionType inst;
     
     uint32_t result = 0;
+    int count = 0;
     
     for(table_iter iter = table_begin(&instruction_table); iter != table_end(&instruction_table); iter = table_iter_next(iter)){
     
@@ -112,7 +113,9 @@ int main(int argc, char **argv) {
 
         switch(inst){
             case(DATA_PROCESSING): 
+                printf("IterNO: %d data procesing %s \n", count, get_mnemonic(currLine));
                 result = ass_data_processing(currLine);
+                printf("%x\n", result);
                 break;
             case(MULTIPLY):
                  result = ass_multiply(currLine);
@@ -127,6 +130,8 @@ int main(int argc, char **argv) {
                 result = ass_special(currLine);
                 break;
         }    
+
+        count++;
         //printf("result: %x\n", result);
         writeBinary(destpath, result);
  

@@ -13,14 +13,14 @@ enum dataInstructionType {RESULT,
 
 char * resultInstructions[] = { "add", "eor", "sub", "rsb", "add", "orr" };
 
-uint32_t cond;
-uint32_t I;
-uint32_t opcode;
+uint32_t cond = 0;
+uint32_t I = 0;
+uint32_t opcode = 0;
 uint32_t S = 0;
-uint32_t RnI;
-uint32_t RdI;
-uint32_t rotation; // for operand2i
-uint32_t operand2I;
+uint32_t RnI = 0;
+uint32_t RdI = 0;
+uint32_t rotation = 0; // for operand2i
+uint32_t operand2I = 0;
 char Rn[2];
 char Rd[2];
 char Rm[2];
@@ -160,6 +160,7 @@ uint32_t getOperand2(char *operand2) {
 
 
 void executeResultInst(char *mnemonic, char *rest) {
+    S = 0;
     sscanf(rest, "%[^','],%[^','],%s", Rd, Rn, operand2);
     RdI = regFromString(Rd);
     RnI = regFromString(Rn);
@@ -167,6 +168,7 @@ void executeResultInst(char *mnemonic, char *rest) {
 
 
 void executeSingleOperandInst(char *mnemonic, char *rest) {
+    S = 0;
     sscanf(rest, "%[^','],%s", Rd, operand2);
     RnI = 0;
     RdI = regFromString(Rd);
@@ -183,6 +185,7 @@ void executeCPSRInst(char *mnemonic, char *rest) {
 
 uint32_t ass_data_processing(char *instruction) {
 
+    printf("%s\n", instruction);
     char *mnemonic = get_mnemonic(instruction);
     char *rest = get_rest(instruction);
 
@@ -221,8 +224,9 @@ uint32_t ass_data_processing(char *instruction) {
     printf("RnI: %d\n", RnI);
     printf("RdI: %d\n", RdI);
     printf("operand2: %d\n", operand2I);
-    printf("instruction: %x\n\n", result);
     */
+    printf("result in data processing: %x\n", result);
+   
     
     return result;
 
