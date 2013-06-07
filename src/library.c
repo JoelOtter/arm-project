@@ -219,6 +219,20 @@ int hasComma(char *address){
     return 0;
 }
 
+int has_sqb_before_comma(char *address){
+    int hassqb = 0;
+    int i = 0;
+    while (address[i] != '\0'){
+        if (address[i++] == ']'){
+            hassqb = 1;
+        }
+        if (address[i] == ','){
+            return hassqb;
+        }
+    }
+    return 0;
+}
+
 int isElemOf(char *searchString, char * list[] ) {
 
     int len = sizeof(searchString)/sizeof(searchString[0]);

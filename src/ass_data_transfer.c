@@ -51,12 +51,13 @@ uint32_t placeAtEnd(uint32_t rd, uint32_t value, int load){
     return result;
 }
 
-uint32_t preOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load){
+uint32_t doOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load, int pre){
     assert(offset <= 4095);
     uint32_t result = 0;
     result += (14 << 28); //cond
     result += (3 << 25);  //01I
-    result += (3 << 23);  //PU
+    result += (pre << 24);
+    result += (1 << 23);  //PU
     result += (load << 20);  //L
     result += (rn << 16); //Rn
     result += (rd << 12); //Rd
@@ -81,17 +82,19 @@ uint32_t ass_data_transfer(char *given, int place){
         else return placeAtEnd(rd, loc, load);
     }
     else if (!isImmediate(address)){
-        if (hasComma(address)){
-            char preReg[15];
-            char preOff[15];
+        char preReg[15];
+        char preOff[15];
+        if (has_sqb_before_comma(address)){
             sscanf(address, "%[^','],%s", preReg, preOff);
-            return preOffset(rd, regFromString(preReg), atoi(&preOff[1]), load);
+            return doOffset(rd, regFromString(preReg), atoi(&preOff[1]), load, 0);
         }
-        
+        if (hasComma(address)){
+            sscanf(address, "%[^','],%s", preReg, preOff);
+            return doOffset(rd, regFromString(preReg), atoi(&preOff[1]), load, 1);
+        }
+        else return directRegister(rd, regFromString(address), load);
     }
-    
-    return directRegister(rd, regFromString(address), load);
-    
+    return 0;
 }
 
 
