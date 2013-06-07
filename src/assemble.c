@@ -29,6 +29,7 @@ void writeBinary(char *path, uint32_t write){
     FILE *fp;
     fp = fopen(path, "ab");
     fwrite(&write, sizeof(uint32_t), 1, fp);
+    fclose(fp);
 }
 
 //needed for getInstruction type
@@ -90,10 +91,10 @@ int main(int argc, char **argv) {
         if (currLine[strlen(currLine) -1] == ':') {
             currLine[strlen(currLine)-1] = 0;
             printf("symbol table ins, (%s), %d\n", currLine, i);
-            table_insert_front(&symbol_table, currLine, i);
+            table_insert_end(&symbol_table, currLine, i);
         } else {
             printf("instruction table ins, (%s), %d\n", currLine, i);
-            table_insert_front(&instruction_table, currLine,i);
+            table_insert_end(&instruction_table, currLine,i);
             i+=4;
         }     
     }
