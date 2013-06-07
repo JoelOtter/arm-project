@@ -25,7 +25,7 @@ uint32_t doMov(uint32_t rd, uint32_t location){
 uint32_t directRegister(uint32_t rd, uint32_t rn, int load){
     uint32_t result = 0;
     result += (14 << 28); //cond
-    result += (3 << 25);  //01I
+    result += (2 << 25);  //01I
     result += (3 << 23);  //PU
     result += (load << 20);  //L
     result += (rn << 16); //Rn
@@ -42,7 +42,7 @@ uint32_t placeAtEnd(uint32_t rd, uint32_t value, int load){
     uint32_t offset = ((&instruction_table)->size + numIn) * 4;
     uint32_t result = 0;
     result += (14 << 28); //cond
-    result += (3 << 25);  //01I
+    result += (2 << 25);  //01I
     result += (3 << 23);  //PU
     result += (load << 20);  //L
     result += (15 << 16); //Rn
@@ -55,7 +55,7 @@ uint32_t doOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load, int pre){
     assert(offset <= 4095);
     uint32_t result = 0;
     result += (14 << 28); //cond
-    result += (3 << 25);  //01I
+    result += (2 << 25);  //01I
     result += (pre << 24);
     result += (1 << 23);  //PU
     result += (load << 20);  //L
