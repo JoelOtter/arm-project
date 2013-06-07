@@ -11,7 +11,7 @@ enum dataInstructionType {RESULT,
                           SINGLE_OPERAND,
                           CPSR};
 
-char * resultInstructions[] = { "add", "eor", "sub", "rsb", "add", "orr" };
+char * resultInstructions[] = { "add", "eor", "sub", "rsb", "and", "orr" };
 
 uint32_t cond = 0;
 uint32_t I = 0;
