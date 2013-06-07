@@ -23,7 +23,7 @@ char *get_mnemonic(char *instruction){
 
 char *get_rest(char *instruction){
     char *result = malloc(5);
-    sscanf(instruction, "%*s %s", result);
+    sscanf(instruction, "%*s %[^\n]", result);
     return result;
 }
 

@@ -33,13 +33,20 @@ uint32_t directRegister(uint32_t rd, uint32_t rn, int load){
     return result;
 }
 
-uint32_t placeAtEnd(uint32_t rd, uint32_t value, int load){
+uint32_t placeAtEnd(uint32_t rd, uint32_t value, int load, int place){
     int numIn = 0;
     for (int i=0; add_afters[i] != 0; i+=4){
         ++numIn;
     }
+
+    printf("Placing at end");
     add_afters[numIn] = value;
-    uint32_t offset = ((&instruction_table)->size + numIn) * 4;
+    ++numIn;
+    uint32_t address_of_last_instruction = (table_end(&instruction_table))->memory_address;
+    uint32_t offset = address_of_last_instruction - (place);
+    offset += 4;
+    offset += (numIn * 4);
+
     uint32_t result = 0;
     result += (14 << 28); //cond
     result += (2 << 25);  //01I
@@ -80,7 +87,7 @@ uint32_t ass_data_transfer(char *given, int place){
     if (address[0] == '='){
         uint32_t loc = strToHex(address);
         if (loc <= 0xff) return doMov(rd, loc);
-        else return placeAtEnd(rd, loc, load);
+        else return placeAtEnd(rd, loc, load, place);
     }
     else if (!isImmediate(address)){
         char preReg[15];
