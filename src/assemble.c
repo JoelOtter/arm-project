@@ -25,7 +25,7 @@ table instruction_table;
 
 uint32_t *add_afters;
 
-void writeBinary(char *path, uint32_t *write){
+void writeBinary(char *path, uint32_t write){
     FILE *fp;
     fp = fopen(path, "ab");
     fwrite(&write, sizeof(uint32_t), 1, fp);
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
  //   char rest[50];
     enum instructionType inst;
     
-    uint32_t result = NULL;
+    uint32_t result = 0;
     
     for(table_iter iter = table_begin(&instruction_table); iter != table_end(&instruction_table); iter = table_iter_next(iter)){
     
