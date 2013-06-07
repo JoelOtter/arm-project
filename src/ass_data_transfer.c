@@ -12,6 +12,7 @@ uint32_t strToHex(char *xStr){
     return strtol(&xStr[1], NULL, 0);
 }
 
+
 uint32_t doMov(uint32_t rd, uint32_t location){
     uint32_t result = 0;
     result += (14 << 28); //cond
@@ -39,23 +40,16 @@ uint32_t placeAtEnd(uint32_t rd, uint32_t value, int load, int place){
         ++numIn;
     }
     
-    printf("Address of current Instruction = %d\n", place);
-    printf("Placing at end: %x\n", value);
     add_afters[numIn] = value;
-    //++numIn;
 
     uint32_t address_of_last_instruction = (table_end(&instruction_table))->prev->memory_address;
 
-    char *last_value = (table_end(&instruction_table))->label;
+    //char *last_value = (table_end(&instruction_table))->label;
 
-    printf("Address of last Instruction = %d\n", address_of_last_instruction);
-    printf("Value of last Instruction = %s\n", last_value);
-    printf("Numin = %d\n",numIn);
 
     uint32_t offset = address_of_last_instruction - (place + 8);
     offset += 4;
     offset += (numIn * 4);
-    printf("OFFSET = %d\n", offset);
     uint32_t result = 0;
     result += (14 << 28); //cond
     result += (2 << 25);  //01I
@@ -82,35 +76,73 @@ uint32_t doOffset(uint32_t rd, uint32_t rn, uint32_t offset, int load, int pre){
     return result;
 }
 
+char* remove_leading_space(char *address){
+
+    if(address[0] == ' '){
+       return &(address[1]);
+    }
+
+    return address;
+}
+
 uint32_t ass_data_transfer(char *given, int place){
-    char mnemonic[5];
-    char args[20];
-    sscanf(given, "%s %s", mnemonic, args);
-    printf("%s\n", mnemonic);
-    char rdStr[15];
-    char address[15];
-    sscanf(args, "%[^','],%s", rdStr, address);
+
+    char *mnemonic = get_mnemonic(given);
+    char *args = get_rest(given);
+
+    char *rdStr = malloc(10);
+    char *address = malloc(30);
+    
+    
+    sscanf(args, "%[^','],%[^\n]", rdStr, address);
+    
+ 
+    address = remove_leading_space(address);
+
+    printf("Address:%s\n", address);
+//  strcpy(address[1], *address[0]);   
+
+   // address = get_rest(&address);
+
     int rd = regFromString(rdStr);
     int load = 1;
-    if (!strcmp(mnemonic, "str")) load = 0;
+
+    if (!strcmp(mnemonic, "str")){
+        load = 0;
+    }
+
+
     if (address[0] == '='){
         uint32_t loc = strToHex(address);
-        if (loc <= 0xff) return doMov(rd, loc);
-        else return placeAtEnd(rd, loc, load, place);
-    }
-    else if (!isImmediate(address)){
-        char preReg[15];
-        char preOff[15];
+        if (loc <= 0xff){
+            return doMov(rd, loc);
+        } else {
+            return placeAtEnd(rd, loc, load, place);
+        }
+
+    } else if (!isImmediate(address)){
+        char *preReg = malloc(15);
+        char *preOff = malloc(15);
+        printf("HERERERE One\n");
+
         if (has_sqb_before_comma(address)){
             sscanf(address, "%[^','],%s", preReg, preOff);
+            printf("HERERERE Two\n");
             return doOffset(rd, regFromString(preReg), atoi(&preOff[1]), load, 0);
         }
         if (hasComma(address)){
-            sscanf(address, "%[^','],%s", preReg, preOff);
+            sscanf(address, "%[^','],%[^\n]", preReg, preOff);
+           
+            preReg = remove_leading_space(preReg);
+            preOff = remove_leading_space(preOff);
+
+ printf("preReg = %s\n", preReg);
+            printf("preOff = %s\n", preOff);
             return doOffset(rd, regFromString(preReg), atoi(&preOff[1]), load, 1);
         }
         else return directRegister(rd, regFromString(address), load);
     }
+    printf("HERERERE Three\n");
     return 0;
 }
 

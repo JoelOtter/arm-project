@@ -92,6 +92,8 @@ int main(int argc, char **argv) {
             currLine[strlen(currLine)-1] = 0;
             printf("symbol table ins, (%s), %d\n", currLine, i);
             table_insert_end(&symbol_table, currLine, i);
+        } else if(currLine[0] == ' ' || currLine[0] == 0){
+            continue;
         } else {
             printf("instruction table ins, (%s), %d\n", currLine, i);
             table_insert_end(&instruction_table, currLine,i);
