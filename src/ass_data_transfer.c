@@ -38,15 +38,24 @@ uint32_t placeAtEnd(uint32_t rd, uint32_t value, int load, int place){
     for (int i=0; add_afters[i] != 0; i+=4){
         ++numIn;
     }
-
-    printf("Placing at end");
+    
+    printf("Address of current Instruction = %d\n", place);
+    printf("Placing at end: %x\n", value);
     add_afters[numIn] = value;
-    ++numIn;
-    uint32_t address_of_last_instruction = (table_end(&instruction_table))->memory_address;
-    uint32_t offset = address_of_last_instruction - (place);
+    //++numIn;
+
+    uint32_t address_of_last_instruction = (table_end(&instruction_table))->prev->memory_address;
+
+    char *last_value = (table_end(&instruction_table))->label;
+
+    printf("Address of last Instruction = %d\n", address_of_last_instruction);
+    printf("Value of last Instruction = %s\n", last_value);
+    printf("Numin = %d\n",numIn);
+
+    uint32_t offset = address_of_last_instruction - (place + 8);
     offset += 4;
     offset += (numIn * 4);
-
+    printf("OFFSET = %d\n", offset);
     uint32_t result = 0;
     result += (14 << 28); //cond
     result += (2 << 25);  //01I
