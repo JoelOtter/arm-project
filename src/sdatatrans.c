@@ -60,7 +60,20 @@ static void load(uint32_t P, uint32_t U, uint32_t offset, uint32_t baseReg, uint
     if (!U) offsetNew = offsetNew * (-1);
     uint32_t regValue = registers[baseReg];
     if (P) regValue += offsetNew;
+    //printf("0x%08x\n", regValue);
     if (regValue + 3 < SIZE_OF_MEMORY) registers[destReg] = getFromMemory(memory, regValue);
+    else if (regValue == 0x20200000) {
+        printf("One GPIO pin from 0 to 9 has been accessed\n");
+        registers[destReg] = regValue;
+    }
+    else if (regValue == 0x20200004) {
+        printf("One GPIO pin from 10 to 19 has been accessed\n"); 
+        registers[destReg] = regValue;
+    }
+    else if (regValue == 0x20200008) {
+        printf("One GPIO pin from 20 to 29 has been accessed\n");
+        registers[destReg] = regValue;
+    }
     else printf("Error: Out of bounds memory access at address 0x%08x\n", regValue);
     if (!P) registers[baseReg] += offsetNew;
 }
@@ -71,6 +84,11 @@ static void store(uint32_t P, uint32_t U, uint32_t offset, uint32_t baseReg, uin
     uint32_t regValue = registers[baseReg];
     if (P) regValue += offsetNew;
     if (regValue + 3 < SIZE_OF_MEMORY) writeToMemory(memory, regValue, registers[destReg]);
+    else if (regValue == 0x20200000) printf("One GPIO pin from 0 to 9 has been accessed\n");
+    else if (regValue == 0x20200004) printf("One GPIO pin from 10 to 19 has been accessed\n");
+    else if (regValue == 0x20200008) printf("One GPIO pin from 20 to 29 has been accessed\n");
+    else if (regValue == 0x20200028) printf("LED OFF!\n");
+    else if (regValue == 0x2020001c) printf("LED ON!\n");
     else printf("Error: Out of bounds memory access at address 0x%08x\n", regValue);
     if (!P) registers[baseReg] += offsetNew;
 }
