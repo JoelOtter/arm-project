@@ -12,15 +12,15 @@
 unsigned char *memory;
 int32_t *registers;
 
-static void loadBinary(const char *filepath);
+static void load_binary(const char *filepath);
 
-static int checkCondition(uint32_t instruction);
+static int check_condition(uint32_t instruction);
 
-static enum instructionType decode(uint32_t instruction);
+static enum instruction_type decode(uint32_t instruction);
 
-void printMemory(void);
+void print_memory(void);
 
-void printNonZeroMemory(void);
+void print_non_zero_memory(void);
 
 int main(int argc, char **argv) {
 
@@ -29,63 +29,63 @@ int main(int argc, char **argv) {
 
     assert(argc == 2);
 
-    loadBinary(argv[1]);
+    load_binary(argv[1]);
     int32_t *PC = &registers[15];
     *PC = 8;
-    uint32_t fetched = getFromMemory(memory, 4);
-    uint32_t decoded = getFromMemory(memory, 0);
-    enum instructionType currentInstType = decode(decoded);
-    int skipToNext = 0;
+    uint32_t fetched = get_from_memory(memory, 4);
+    uint32_t decoded = get_from_memory(memory, 0);
+    enum instruction_type current_inst_type = decode(decoded);
+    int skip_to_next = 0;
 
     while(decoded != 0){
 
-        skipToNext = 0;
+        skip_to_next = 0;
 
         // If condition is satisfied, execute current instruction!
-        if(checkCondition(decoded)){
-            switch(currentInstType){
+        if(check_condition(decoded)){
+            switch(current_inst_type){
                 case(DATA_PROCESSING):
-                    dataProcess(decoded);
+                    data_process(decoded);
                 break;
                 case(BRANCH):
                     branch(decoded);
-                    fetched = getFromMemory(memory, *PC + 4);
-                    decoded = getFromMemory(memory, *PC);
-                    currentInstType = decode(decoded);
+                    fetched = get_from_memory(memory, *PC + 4);
+                    decoded = get_from_memory(memory, *PC);
+                    current_inst_type = decode(decoded);
                     *PC += 8;
-                    skipToNext = 1;
+                    skip_to_next = 1;
                 break;
                 case(MULTIPLY):
                     multiply(decoded);
                 break;
                 case(SINGLE_DATA_TRANSFER):
-                    singleDataTransfer(decoded);
+                    single_data_transfer(decoded);
                 break;
              }        
         } 
 
-        if (skipToNext) continue;
+        if (skip_to_next) continue;
 
         //Decode the fetched instruction.
-        currentInstType = decode(fetched);
+        current_inst_type = decode(fetched);
         decoded = fetched;
 
         //Fetch new instruction
-        fetched = getFromMemory(memory, *PC);
+        fetched = get_from_memory(memory, *PC);
 
         //Increment PC to next instruction
         *PC += 4; 
 
     }
 
-    printRegisters(registers);
-    printNonZeroMemory();
+    print_registers(registers);
+    print_non_zero_memory();
 
     free(memory);
     free(registers);
 }
 
-static void loadBinary(const char *filepath) {
+static void load_binary(const char *filepath) {
 
     // should malloc fail, print error message and return failure
     if (memory == NULL) {
@@ -111,7 +111,7 @@ static void loadBinary(const char *filepath) {
     fclose(fp);
 }
 
-static int checkCondition(uint32_t instruction) {
+static int check_condition(uint32_t instruction) {
 
     //CSPR register values
     uint32_t cspr = registers[16];
@@ -119,44 +119,44 @@ static int checkCondition(uint32_t instruction) {
     uint32_t Z = mask1 & (cspr >> 30);
     uint32_t V = mask1 & (cspr >> 28);
 
-    uint32_t condNumber = mask4 & (instruction >> 28);
-    int condflag = 0;
+    uint32_t cond_number = mask4 & (instruction >> 28);
+    int cond_flag = 0;
 
-    switch(condNumber) {
+    switch(cond_number) {
 
         case(0):
             // eq
-            condflag = Z;
+            cond_flag = Z;
             break;
         case(1):
             // ne
-            condflag = 1-Z;
+            cond_flag = 1-Z;
             break;
         case(10):
             // ge
-            condflag = (N == V);
+            cond_flag = (N == V);
             break;
         case(11): 
             // lt
-            condflag = (N != V);
+            cond_flag = (N != V);
             break;
         case(12):
             // gt
-            condflag = ((Z == 0) && (N == V));
+            cond_flag = ((Z == 0) && (N == V));
             break;
         case(13):
             //le
-            condflag = ((Z == 1) || (N != V));
+            cond_flag = ((Z == 1) || (N != V));
             break;
         case(14):
             // al (always 1)
-            condflag = 1;
+            cond_flag = 1;
             break;
     }
-    return condflag;
+    return cond_flag;
 }
 
-static enum instructionType decode(uint32_t instruction){ //Instruction is 32 bits
+static enum instruction_type decode(uint32_t instruction){ //Instruction is 32 bits
 
     /*Idea for this function:
     * shift the instruction so that bits 27 - 25 are now bits 2 - 0.
@@ -164,18 +164,18 @@ static enum instructionType decode(uint32_t instruction){ //Instruction is 32 bi
     * the result is different depending on the instruction.
     * explained further in switch comments
     */
-    enum instructionType inst;       
+    enum instruction_type inst;       
     const uint32_t mask3 =  7; //Binary equivelant = ... 0000 0111
     const uint32_t mask4 = 15; // Binary equivalant = ...0000 1111
-    uint32_t shiftInst = instruction >> 25;
+    uint32_t shift_inst = instruction >> 25;
 
-    switch(mask3 & shiftInst){
+    switch(mask3 & shift_inst){
 
         case(0):
             // if result is (000) then could be either data processing or multiply. 
             // further examiination of bits 7 -  4 will determine the instruction type.
-            shiftInst = instruction >> 4;
-            if((mask4 & shiftInst) == 9){
+            shift_inst = instruction >> 4;
+            if((mask4 & shift_inst) == 9){
                 inst = MULTIPLY;
             } else {
                 inst = DATA_PROCESSING;
@@ -205,7 +205,7 @@ static enum instructionType decode(uint32_t instruction){ //Instruction is 32 bi
 
 // Functions for testing!!!
 
-void print8Bits(uint8_t x) {
+void print_8_bits(uint8_t x) {
     
     int i;
 
@@ -223,12 +223,12 @@ void print8Bits(uint8_t x) {
     printf("\n");
 }
 
-void printNonZeroMemory(void) {
+void print_non_zero_memory(void) {
     printf("Non-zero memory:\n");
     for (int i = 0; i< 65536; i+=4) {
-        uint32_t memoryContent = getFromMemory(memory, i);
-        if (memoryContent != 0) {
-            printf("0x%08x: 0x%08x\n", i, memoryContent);
+        uint32_t memory_content = get_from_memory(memory, i);
+        if (memory_content != 0) {
+            printf("0x%08x: 0x%08x\n", i, memory_content);
         }
     }
 }

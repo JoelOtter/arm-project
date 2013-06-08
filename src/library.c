@@ -28,7 +28,7 @@ char *get_rest(char *instruction){
 }
 
 
-uint32_t getFromMemory(unsigned char *memory, int start) {
+uint32_t get_from_memory(unsigned char *memory, int start) {
 
     uint32_t p1 = memory[start+3] << 24;
     uint32_t p2 = memory[start+2] << 16;
@@ -38,14 +38,14 @@ uint32_t getFromMemory(unsigned char *memory, int start) {
     return (p1 | p2 | p3 | p4);
 }
 
-void writeToMemory(unsigned char *memory, int start, uint32_t value) {
+void write_to_memory(unsigned char *memory, int start, uint32_t value) {
     memory[start+3] = value >> 24;
     memory[start+2] = value >> 16;
     memory[start+1] = value >> 8;
     memory[start] = value;
 }
 
-void printRegisters(int *registers){
+void print_registers(int *registers){
 
     printf("Registers:\n");
     printf("$0  : %10d (0x%08x)\n", registers[0],registers[0]);
@@ -65,7 +65,7 @@ void printRegisters(int *registers){
     printf("CPSR: %10d (0x%08x)\n", registers[16],registers[16]);
 }
 
-void printBits(uint32_t x) {
+void print_bits(uint32_t x) {
     
     int i;
 
@@ -83,7 +83,7 @@ void printBits(uint32_t x) {
     printf("\n");
 }
 
-void printMemory(uint8_t x) {
+void print_memory(uint8_t x) {
     
     int i;
 
@@ -101,7 +101,7 @@ void printMemory(uint8_t x) {
     printf("\n");
 }
 
-uint32_t generateMask(uint32_t length){
+uint32_t generate_mask(uint32_t length){
 
     uint32_t mask = 0;
 
@@ -114,7 +114,7 @@ uint32_t generateMask(uint32_t length){
     return mask;
 }
 
-uint32_t logShiftLeft(uint32_t value, uint32_t scale) {
+uint32_t log_shift_left(uint32_t value, uint32_t scale) {
 
     carryout = (value >> (32 - scale)) & mask1;
     if (scale == 0) carryout = 0;
@@ -123,7 +123,7 @@ uint32_t logShiftLeft(uint32_t value, uint32_t scale) {
 
 }
 
-uint32_t logShiftRight(uint32_t value, uint32_t scale) {
+uint32_t log_shift_right(uint32_t value, uint32_t scale) {
     
     carryout = 0;
     if (scale > 0) {
@@ -133,11 +133,11 @@ uint32_t logShiftRight(uint32_t value, uint32_t scale) {
     return value;
 }
 
-uint32_t arithShiftRight(uint32_t value, uint32_t scale) {
+uint32_t arith_shift_right(uint32_t value, uint32_t scale) {
 
     uint32_t sign = value >> 31;
 
-    value = logShiftRight(value, scale);
+    value = log_shift_right(value, scale);
     
     if (sign == 1) {
         uint32_t mask = 0;
@@ -152,7 +152,7 @@ uint32_t arithShiftRight(uint32_t value, uint32_t scale) {
     return value;
 }
 
-uint32_t rotateRight(uint8_t rotate, uint32_t value){
+uint32_t rotate_right(uint8_t rotate, uint32_t value){
 
     // rotate has to be multiple of 2 and between 0 and 30
     assert(rotate <= 30 && rotate % 2 == 0);
@@ -178,7 +178,7 @@ uint32_t rotateRight(uint8_t rotate, uint32_t value){
     return (result);    
 }
 
-int signExtend(int value, int length){
+int sign_extend(int value, int length){
 
     uint32_t sign = value >> (length - 1);    //Gets most significant bit, the sign!!
     uint32_t extension = 32 - length;    
@@ -198,20 +198,20 @@ int signExtend(int value, int length){
     return value;
 }
 
-int regFromString(char *rstring){
+int reg_from_string(char *rstring){
     if (rstring[0] == '['){
-        return regFromString(&rstring[1]);
+        return reg_from_string(&rstring[1]);
     }
     char value[5];
     sscanf(rstring, "r%s", value);
     return (atoi(value));
 }
 
-int isImmediate(char *rstring){
+int is_immediate(char *rstring){
     return !(rstring[0] == '[');
 }
 
-int hasComma(char *address){
+int has_comma(char *address){
     int i = 0;
     while (address[i] != '\0'){
         if (address[i++] == ',') return 1;
@@ -233,7 +233,7 @@ int has_sqb_before_comma(char *address){
     return 0;
 }
 
-int isElemOf(char *searchString, char *list[] , unsigned long int len) {
+int is_elem_of(char *search_string, char *list[] , unsigned long int len) {
 
   //  int len = sizeof(list);  
     printf("%lu\n", len);
@@ -241,7 +241,7 @@ int isElemOf(char *searchString, char *list[] , unsigned long int len) {
 
     for(i = 0; i < len; ++i) {
         
-        if(!strcmp(list[i], searchString)){
+        if(!strcmp(list[i], search_string)){
             return 1;
         }
     }

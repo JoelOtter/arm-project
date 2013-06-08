@@ -21,23 +21,14 @@ uint32_t ass_multiply(char *instruction) {
     } else {
         sscanf(rest, "%[^','], %[^','], %[^','],%s", Rd, Rm, Rs, Rn);
         result |= (1 << 21);
-        RnI = regFromString(Rn);
+        RnI = reg_from_string(Rn);
     }
 
-    RdI = regFromString(Rd);
-    RmI = regFromString(Rm);
-    RsI = regFromString(Rs);
+    RdI = reg_from_string(Rd);
+    RmI = reg_from_string(Rm);
+    RsI = reg_from_string(Rs);
 
     result |= (RdI << 16) | (RnI << 12) | (RsI << 8) | (RmI & mask4);
 
-    //printf("%x\n", result);
-
     return result;
 }
-
-/*
-int main(int argc, char const *argv[])
-{
-    return assMultiply("mla", "r1,r2,r3,r4");
-}
-*/

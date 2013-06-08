@@ -8,7 +8,7 @@ extern const int SIZE_OF_MEMORY;
 extern const int NUM_REGISTERS;
 
 //ENUMS
-enum instructionType    {DATA_PROCESSING,
+enum instruction_type    {DATA_PROCESSING,
                          BRANCH,
                          MULTIPLY,
                          SINGLE_DATA_TRANSFER};

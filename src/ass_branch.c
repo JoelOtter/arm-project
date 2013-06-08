@@ -12,7 +12,7 @@ uint32_t get_result(uint32_t cond, int32_t offset) {
 
     uint32_t result  = (1 << 27) | (1 << 25);
     
-    result |= (cond << 28) | ((offset >> 2) & generateMask(24));
+    result |= (cond << 28) | ((offset >> 2) & generate_mask(24));
     
     return result;
 }
@@ -55,12 +55,3 @@ uint32_t ass_branch(char *instruction){
     return(get_result(cond, offset));
 
 }
-/*
-int main(void) {
-    table_constructor(&symbol_ttable);
-    table_constructor(&instruction_ttable);
-    table_insert_front(&instruction_ttable, "bne loop", 12);
-    table_insert_front(&symbol_ttable, "loop", 4);
-    printf("%x\n", ass_branch("bne loop"));
-}
-*/

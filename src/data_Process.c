@@ -6,7 +6,7 @@
 #include "data_Process.h"
 #include "library.h"
 
-enum opcodeType    {AND,
+enum opcode_type    {AND,
                     EOR,
                     SUB,
                     RSB,
@@ -17,13 +17,13 @@ enum opcodeType    {AND,
                     ORR,
                     MOV};
 
-static enum opcodeType getOpcode(uint32_t instruction) {
+static enum opcode_type get_opcode(uint32_t instruction) {
 
-    uint32_t opNumber= mask4 & (instruction >> 21);
+    uint32_t op_number= mask4 & (instruction >> 21);
 
-    enum opcodeType op; 
+    enum opcode_type op; 
 
-    switch(opNumber){
+    switch(op_number){
         case(0):  op = AND; break;
         case(1):  op = EOR; break;    
         case(2):  op = SUB; break;
@@ -36,17 +36,16 @@ static enum opcodeType getOpcode(uint32_t instruction) {
         case(13): op = MOV; break;
     }
    return op;
-}  
-
-
-static int32_t getOperand1(uint32_t instruction) {
-    //Operand1 is always in Rn 19-16
-
-    uint32_t regNo = ((instruction >> 16) & mask4);
-    return registers[regNo]; 
 }
 
-static int32_t getOperand2(uint32_t instruction) {
+static int32_t get_operand_1(uint32_t instruction) {
+    //Operand1 is always in Rn 19-16
+
+    uint32_t reg_no = ((instruction >> 16) & mask4);
+    return registers[reg_no]; 
+}
+
+static int32_t get_operand_2(uint32_t instruction) {
     //Operand2 is either immediate (in which case we just take the value and extend)
     //Or it is in a register in which case we have to apply shift operations
 
@@ -63,42 +62,41 @@ static int32_t getOperand2(uint32_t instruction) {
         uint32_t imm = mask8 & instruction;
         uint32_t rotate = (mask4 & (instruction >>  8)) << 1; 
         // shifted the instruction by 8 to get the rotate, applied the mask, then x2.
-        result = rotateRight(rotate, imm);
+        result = rotate_right(rotate, imm);
 
     } else {
 
         //Operand2 register
-        uint32_t shift = mask8 & (instruction >> 4);    // shift   instruction(11-4)
-        uint32_t shiftType = mask2 & (shift >> 1); //  - shift type shift(6 -5)
+        uint32_t shift = mask8 & (instruction >> 4); //shift instruction(11-4)
+        uint32_t shiftType = mask2 & (shift >> 1); //shift type shift(6 -5)
 
-        uint32_t scale = mask5 & (shift >> 3); //  - integer    shift(11-7)
+        uint32_t scale = mask5 & (shift >> 3); //integer shift(11-7)
         if (shift & mask1) {
             scale = registers[mask4 & (shift >> 4)];
         }
-        uint32_t rm    = mask4 & instruction;      // rm      instruction(3 -0)
+        uint32_t rm = mask4 & instruction; //rm instruction(3 -0)
         
-        uint32_t rmValue = registers[rm];
+        uint32_t rm_value = registers[rm];
         
         switch(shiftType) {
             case(0): 
-                result = logShiftLeft(rmValue, scale);
+                result = log_shift_left(rm_value, scale);
                 break;
             case(1):
-                result = logShiftRight(rmValue, scale);
+                result = log_shift_right(rm_value, scale);
                 break;
             case(2):
-                result = arithShiftRight(rmValue, scale);
+                result = arith_shift_right(rm_value, scale);
                 break;
             case(3):
-                result = rotateRight(rmValue, scale);
+                result = rotate_right(rm_value, scale);
                 break;
         }
     }
     return result;
 }
 
-
-static void setFlags(int32_t result, uint32_t S) {
+static void set_flags(int32_t result, uint32_t S) {
     //update flags
    
    if(S == 1) {
@@ -112,40 +110,38 @@ static void setFlags(int32_t result, uint32_t S) {
     // Set carry out
     uint32_t C = carryout << 29 ;
 
-    uint32_t csprMask = generateMask(28);
-    cspr &= csprMask;
+    uint32_t cspr_mask = generate_mask(28);
+    cspr &= cspr_mask;
     cspr |= N | Z | C;
     registers[16] = cspr;
    }
 }
 
+void data_process(uint32_t instruction) {
 
+    enum opcode_type op = get_opcode(instruction);
 
-void dataProcess(uint32_t instruction) {
-
-    enum opcodeType op = getOpcode(instruction);
-
-    int32_t operand1 = getOperand1(instruction);
-    int32_t operand2 = getOperand2(instruction);
-    uint32_t destinationRegister = (mask4 & (instruction >> 12));
+    int32_t operand1 = get_operand_1(instruction);
+    int32_t operand2 = get_operand_2(instruction);
+    uint32_t destination_register = (mask4 & (instruction >> 12));
     uint32_t S = (instruction >> 20) & mask1;
-    int32_t result = registers[destinationRegister];
-    int32_t tempResult;
+    int32_t result = registers[destination_register];
+    int32_t temp_result;
 
     switch(op){
 
-        case(AND): result = (operand1 & operand2); setFlags(result, S); break;
-        case(EOR): result = (operand1 ^ operand2) ; setFlags(result, S); break;
-        case(SUB): result = (operand1 - operand2) ; setFlags(result, S); break;
-        case(RSB): result = (operand2 - operand1) ; setFlags(result, S); break;
-        case(ADD): result = (operand1 + operand2) ; setFlags(result, S); break;
+        case(AND): result = (operand1 & operand2); set_flags(result, S); break;
+        case(EOR): result = (operand1 ^ operand2); set_flags(result, S); break;
+        case(SUB): result = (operand1 - operand2); set_flags(result, S); break;
+        case(RSB): result = (operand2 - operand1); set_flags(result, S); break;
+        case(ADD): result = (operand1 + operand2); set_flags(result, S); break;
 
-        case(TST): tempResult = operand1 & operand2 ; setFlags(tempResult, S); break; 
-        case(TEQ): tempResult = operand1 ^ operand2  ; setFlags(tempResult, S); break; 
-        case(CMP): tempResult = operand1 - operand2  ; setFlags(tempResult, S); break; 
+        case(TST): temp_result = operand1 & operand2; set_flags(temp_result, S); break; 
+        case(TEQ): temp_result = operand1 ^ operand2; set_flags(temp_result, S); break; 
+        case(CMP): temp_result = operand1 - operand2; set_flags(temp_result, S); break; 
 
-        case(ORR): result = (operand1 | operand2); setFlags(result, S); break;
-        case(MOV): result = operand2              ; setFlags(result, S); break;
+        case(ORR): result = (operand1 | operand2); set_flags(result, S); break;
+        case(MOV): result = operand2; set_flags(result, S); break;
     }
-    registers[destinationRegister] = result;
+    registers[destination_register] = result;
 }

@@ -7,41 +7,6 @@
 #define not_found_exception "Not found"
 #define memory_address_not_found_exception 404
 
-
-/*
-Symbol table based on a linked listy kinda thing
-Stores String int32_t pairs
-
-Can be used for
-    (Label, Memory address)
-    (Opcode/condition mnemonics, opcodes/conditions themselves)
-
-Have not implemented delete - seems uneccessary for assembler
-
-*/
-/*
-struct table {
-    struct table_elem *header;
-    struct table_elem *footer;
-    int32_t size;
-};
-
-//Suggestion: variable are called labelOrNmonic
-//            and addressOropCode?
-// Or just have more general names. like val and key or smat
-// To help readability when debugging
-
-struct table_elem {
-    char *label;
-    uint32_t memory_address;
-    struct table_elem *prev;
-    struct table_elem *next;
-};
-
-typedef struct table_elem *table_iter;
-
-*/
-
 struct table t;
 
 struct table_elem *table_alloc_elem(void) {
@@ -76,28 +41,13 @@ static void insert_elem(struct table *table, table_iter iter, char *label, uint3
     //allocate memory to new item and add its values
     struct table_elem *new_elem = table_alloc_elem();
     new_elem->memory_address = memory_address;
-    //*(new_elem->label) = *label;
     strcpy(new_elem->label,label);
-    //printf("%s\n",copy);
-    
 
     new_elem->prev = iter->prev;
     new_elem->next = iter;
     
     iter->prev->next = new_elem;
     iter->prev = new_elem;
-
-    /*for(table_iter iter = table_begin(table); iter != table_end(table); iter = table_iter_next(iter)){
-        print_table_elem(iter);
-        print_table_elem(new_elem);
-        print_table_elem(iter->prev);
-        print_table_elem(iter->next);
-                print_table_elem(new_elem->next);
-
-
-
-    }
-    */
 
     printf("\n");
 
@@ -183,27 +133,3 @@ void print_table_elem(struct table_elem *table_elem) {
     printf("[ Label: %s \t Address: %i ]\n", table_elem->label, table_elem->memory_address);
 
 }
- 
- /*
-int main(int argc, char **argv) {
-
-    table_iter iter = table_constructor(&t);
-
-    insert_elem(&t, iter, "Denise", 1);
-    insert_elem(&t, iter, "Zues", 2);
-    insert_elem(&t, iter, "Joel", 3);
-    insert_elem(&t, iter, "Jack", 4);
-    
-    printf("%i\n", get_memory_address(&t, "Denise")); //100
-    printf("%i\n", get_memory_address(&t, "Zues")); // 99
-    printf("%i\n", get_memory_address(&t, "Joel")); //testerror (404)
-    printf("%s\n", get_label(&t, 1)); // jack
-    printf("%s\n", get_label(&t, 2)); //testerror (Not found)
-
-    
-    
-
-    return 0;
-
-}*/
-

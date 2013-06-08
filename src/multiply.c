@@ -17,7 +17,7 @@ enum opcodeType    {AND,
 
 
 
-static void setFlagsMultiply(uint32_t result, uint32_t S) {
+static void set_flags_multiply(uint32_t result, uint32_t S) {
     //update flags
    
    if(S) {
@@ -28,10 +28,9 @@ static void setFlagsMultiply(uint32_t result, uint32_t S) {
     uint32_t N = result & (1 << 31); 
     // Set Z if result is zero
     uint32_t Z = (result == 0) << 30 ;
-    //printf("(Result == 0) = %d\n", (result == 0));
     //generate mask of 30 since V and C are unchanged
-    uint32_t cpsrMask = generateMask(30);
-    cpsr &= cpsrMask;
+    uint32_t cpsr_mask = generate_mask(30);
+    cpsr &= cpsr_mask;
 
     cpsr |= N | Z;
 
@@ -56,6 +55,6 @@ void multiply(uint32_t instruction) {
     } 
     registers[Rd] = temp;
 
-    setFlagsMultiply(temp, S);
+    set_flags_multiply(temp, S);
 
 }
