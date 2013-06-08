@@ -3,10 +3,10 @@
 #include <stdio.h>
 #include <assert.h>
 #include "emulate.h"
-#include "data_Process.h"
+#include "emu_data_process.h"
 #include "library.h"
 
-enum opcode_type    {AND,
+enum opcode_type   {AND,
                     EOR,
                     SUB,
                     RSB,

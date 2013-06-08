@@ -2,10 +2,10 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdint.h>
-#include "sdatatrans.h"
-#include "multiply.h"
-#include "data_Process.h"
-#include "branch.h"
+#include "emu_data_transfer.h"
+#include "emu_multiply.h"
+#include "emu_data_process.h"
+#include "emu_branch.h"
 #include "emulate.h"
 #include "library.h"
 

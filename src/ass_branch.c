@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
-#include "symboltableadt.h"
+#include "ass_symbol_table.h"
 #include "assemble.h"
 #include "ass_branch.h"
 #include "library.h"

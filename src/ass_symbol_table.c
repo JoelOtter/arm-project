@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <stdint.h>
 #include <string.h>
-#include "symboltableadt.h"
+#include "ass_symbol_table.h"
 #define not_found_exception "Not found"
 #define memory_address_not_found_exception 404
 

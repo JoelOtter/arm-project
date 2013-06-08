@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "library.h"
-#include "branch.h"
+#include "emu_branch.h"
 #include "emulate.h"
 
 static int get_offset(uint32_t instruction){

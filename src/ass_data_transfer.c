@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include "library.h"
-#include "symboltableadt.h"
+#include "ass_symbol_table.h"
 #include "assemble.h"
 
 table instruction_table;

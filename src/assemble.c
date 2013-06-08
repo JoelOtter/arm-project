@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "ass_data_transfer.h"
-#include "symboltableadt.h"
+#include "ass_symbol_table.h"
 #include "library.h"
 #include "ass_data_processing.h"
 #include "ass_multiply.h"
