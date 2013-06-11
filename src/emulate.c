@@ -11,6 +11,7 @@
 
 unsigned char *memory;
 int32_t *registers;
+int debug;
 
 static void load_binary(const char *filepath);
 
@@ -20,14 +21,14 @@ static enum instruction_type decode(uint32_t instruction);
 
 void print_memory(void);
 
-void print_non_zero_memory(void);
-
 int main(int argc, char **argv) {
 
     memory = calloc(SIZE_OF_MEMORY, sizeof(char));
     registers = calloc(NUM_REGISTERS, sizeof(int32_t));
 
-    assert(argc == 2);
+    assert(argc == 2 || argc == 3);
+
+    debug = (argc == 3);
 
     load_binary(argv[1]);
     int32_t *PC = &registers[15];
@@ -64,6 +65,8 @@ int main(int argc, char **argv) {
              }        
         } 
 
+        if (debug) print_to_debug(registers, memory);
+
         if (skip_to_next) continue;
 
         //Decode the fetched instruction.
@@ -79,7 +82,7 @@ int main(int argc, char **argv) {
     }
 
     print_registers(registers);
-    print_non_zero_memory();
+    print_non_zero_memory(memory);
 
     free(memory);
     free(registers);
@@ -222,14 +225,3 @@ void print_8_bits(uint8_t x) {
 
     printf("\n");
 }
-
-void print_non_zero_memory(void) {
-    printf("Non-zero memory:\n");
-    for (int i = 0; i< 65536; i+=4) {
-        uint32_t memory_content = get_from_memory(memory, i);
-        if (memory_content != 0) {
-            printf("0x%08x: 0x%08x\n", i, memory_content);
-        }
-    }
-}
-

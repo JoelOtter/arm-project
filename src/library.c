@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
+#include <string.h>
 #include "library.h"
 
 // All the masks are up here
@@ -45,7 +46,7 @@ void write_to_memory(unsigned char *memory, int start, uint32_t value) {
     memory[start] = value;
 }
 
-void print_registers(int *registers){
+void print_registers(int32_t *registers){
 
     printf("Registers:\n");
     printf("$0  : %10d (0x%08x)\n", registers[0],registers[0]);
@@ -63,6 +64,106 @@ void print_registers(int *registers){
     printf("$12 : %10d (0x%08x)\n", registers[12],registers[12]);
     printf("PC  : %10d (0x%08x)\n", registers[15],registers[15]);
     printf("CPSR: %10d (0x%08x)\n", registers[16],registers[16]);
+}
+
+void print_non_zero_memory(unsigned char *memory) {
+    printf("Non-zero memory:\n");
+    for (int i = 0; i< 65536; i+=4) {
+        uint32_t memory_content = get_from_memory(memory, i);
+        if (memory_content != 0) {
+            printf("0x%08x: 0x%08x\n", i, memory_content);
+        }
+    }
+}
+
+int has_next_non_zero(unsigned char *memory, int from) {
+    for (int i = from+4; i< 65536; i+=4) {
+        uint32_t memory_content = get_from_memory(memory, i);
+        if (memory_content != 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
+// returns strring in array you pass.
+char *itoa(uint i, char b[]){
+    for(int i = 0; i < 16; ++i) {
+        b[i] = '\0';
+    }
+
+    char const digit[] = "0123456789";
+    char* p = b;
+    if(i<0){
+        *p++ = '-';
+        i = -1;
+    }
+    int shifter = i;
+    do{ //Move to where representation ends
+        ++p;
+        shifter = shifter/10;
+    }while(shifter);
+    *p = '\0';
+    do{ //Move back, inserting digits as u go
+        *--p = digit[i%10];
+        i = i/10;
+    }while(i);
+    return b;
+}
+
+void print_to_debug(int32_t *registers, unsigned char *memory) {
+    // register value b= 10 digits = 10 chars *15 cos 15 registers
+    // 16 chars for address + 10 chars for content
+    FILE *df;
+
+    char nothing = '\0';
+    if ((df = fopen("debug_file", "w")) == NULL) {
+        perror("Error opening file!");
+        exit(EXIT_FAILURE);
+    } else {
+        fwrite(&nothing, 0, 1, df);
+        fclose(df);
+    }
+
+    if ((df = fopen("debug_file", "a")) == NULL) {
+        perror("Error opening file!");
+        exit(EXIT_FAILURE);
+    }
+
+    char int_as_string[16];
+    fprintf(df, "[[");
+    for(int i = 0; i < 17; ++i) {
+        fprintf(df, "%s", itoa(registers[i], int_as_string));
+        if(i != 16){
+            fprintf(df, ",");
+        }
+    }
+    fprintf(df, "],[");
+
+    for (int i = 0; i< 65536; i+=4) {
+        uint32_t memory_content = get_from_memory(memory, i);
+        if (memory_content != 0) {
+            
+            fprintf(df, "[");
+            
+            fprintf(df, "%s", itoa(i, int_as_string));
+
+            fprintf(df, ",");
+
+            fprintf(df, "%s", itoa(memory_content, int_as_string));
+
+            fprintf(df, "]");
+
+            if (has_next_non_zero(memory, i)) {
+                fprintf(df, ",");
+            }
+        }
+    }
+
+
+    fprintf(df, "]]");
+
+    fclose(df);
 }
 
 void print_bits(uint32_t x) {

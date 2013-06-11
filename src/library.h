@@ -33,7 +33,11 @@ uint32_t get_from_memory(unsigned char *memory, int start);
 
 void write_to_memory(unsigned char *memory, int start, uint32_t value);
 
-void print_registers(int *registers);
+void print_registers(int32_t *registers);
+
+void print_non_zero_memory(unsigned char *memory);
+
+void print_to_debug(int32_t *registers, unsigned char *memory);
 
 int reg_from_string(char *rstring);
 
