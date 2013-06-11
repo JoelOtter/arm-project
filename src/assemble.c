@@ -59,6 +59,19 @@ int main(int argc, char **argv) {
     
     char *srcpath = argv[1];
     char *destpath = argv[2];
+
+    //Clear the destination file if need be
+    FILE *fd;
+    char nothing = '\0';
+    if ((fd = fopen(destpath, "w")) == NULL) {
+            perror("Error opening file!");
+            exit(EXIT_FAILURE);
+    }
+    else{
+        fwrite(&nothing, 0, 1, fd);
+        fclose(fd);
+    }
+
     int size = 512;
     char curr_line[size];
     FILE *fp;
@@ -128,7 +141,6 @@ int main(int argc, char **argv) {
         }    
 
         count++;
-        //printf("result: %x\n", result);
         write_binary(destpath, result);
     }
 
