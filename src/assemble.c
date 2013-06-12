@@ -42,6 +42,12 @@ enum instruction_type get_instruction_type(char *opcode){ //TODO
     enum instruction_type inst;       
     char first = opcode[0];
 
+    if ( ! is_valid_instruction(opcode) ) {
+        wrong = 1;
+        line_number = (line_number/4) + 1;
+        suggest(opcode, line_number); //TODO from the library
+    }
+
     if (!strcmp(opcode, "mul") || !strcmp(opcode, "mla") )  {
         inst = MULTIPLY;
     } else if ( !strcmp(opcode, "ldr") ||  !strcmp(opcode, "str") ) {
@@ -52,12 +58,8 @@ enum instruction_type get_instruction_type(char *opcode){ //TODO
         inst = SPECIAL;
     } else if ( is_elem_of(opcode, data_processing_op_codes, data_p_size) ) {
         inst = DATA_PROCESSING;
-    } else if (debug) {
-        wrong = 1;
-        line_number = (line_number/4) + 1;
-        suggest(opcode, line_number); //TODO from the library
-    }
-
+    } 
+    
    return inst;
 
 }  
@@ -184,7 +186,7 @@ int main(int argc, char **argv) {
         strcat(cmd, "python debugger.py ");
         strcat(cmd, srcpath);
         strcat(cmd, " &");
-        //system(cmd);
+        system(cmd);
     }
     // GUI call with srcpath
 }

@@ -133,10 +133,10 @@ void print_to_debug(int32_t *registers, unsigned char *memory) {
         exit(EXIT_FAILURE);
     }
 
-    char int_as_string[16];
+    //char int_as_string[16];
     fprintf(df, "[[");
     for(int i = 0; i < 17; ++i) {
-        fprintf(df, "%s", itoa(registers[i], int_as_string));
+        fprintf(df, "%d", registers[i]);
         if(i != 16){
             fprintf(df, ",");
         }
@@ -149,11 +149,11 @@ void print_to_debug(int32_t *registers, unsigned char *memory) {
             
             fprintf(df, "[");
             
-            fprintf(df, "%s", itoa(i, int_as_string));
+            fprintf(df, "%d", i);
 
             fprintf(df, ",");
 
-            fprintf(df, "%s", itoa(memory_content, int_as_string));
+            fprintf(df, "%d", memory_content);
 
             fprintf(df, "]");
 
@@ -385,9 +385,9 @@ char *get_suggestions(char *s, char *list[], int length) {
     char *append;
     
     if ( strlen(s) == 1 ) {
-        strcat(suggestions, " b");
+        strcat(suggestions, "b");
     } else if ( strlen(s) >= 5 ) {
-        strcat(suggestions, " andeq");
+        strcat(suggestions, "andeq");
     } else {
         char *s2 = malloc ( 5 );
         strcpy(s2, " ");
@@ -401,27 +401,33 @@ char *get_suggestions(char *s, char *list[], int length) {
             }
         }
     }
-    return suggestions;
+    return remove_leading_spaces(suggestions);
 }
 
-
-void suggest(char *input_string, int line_number) {
-
- //   char *result = malloc ( 200 * sizeof(char) );
     char *valid_instructions[] = { "add", "sub", "rsb", "and", "eor", "orr", "mov", 
                                    "tst", "teq", "cmp", "mul", "mla", "ldr", "str", 
                                    "beq", "bne", "bge", "blt", "bgt", "ble", "lsl" };
                                    
     int valid_instructions_length = sizeof(valid_instructions)/8;
+
+
+void suggest(char *input_string, int line_number) {
+
+ //   char *result = malloc ( 200 * sizeof(char) );
+    
     char *suggestion = get_suggestions(input_string, valid_instructions, valid_instructions_length);
     FILE *df;
     if ((df = fopen("debug_suggestions", "a")) == NULL) {
         perror("Error opening file!");
         exit(EXIT_FAILURE);
     }
-    fprintf(df, "[line %d] error: invalid opcode '%s', did you mean:%s ?\n", line_number, input_string, suggestion);
+    fprintf(df, "[%d, \"%s\", \"%s\"]\n", line_number, input_string, suggestion);
     fclose(df);
   //  return result;
+}
+
+int is_valid_instruction(char *string) {
+    return ( is_elem_of(string, valid_instructions, valid_instructions_length));
 }
 
 

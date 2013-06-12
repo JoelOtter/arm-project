@@ -55,4 +55,6 @@ char* remove_leading_spaces(char *string);
 
 void suggest(char *input_string, int line_number); //part of extensoin
 
+int is_valid_instruction(char *string);
+
 #endif

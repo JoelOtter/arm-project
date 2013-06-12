@@ -3,7 +3,7 @@ from gi.repository import Gtk
 import json
 import sys
 
-filename = "testfile"
+filename = "debug_file"
 assemblypath = sys.argv[1]
 
 class DebugWindow(Gtk.Window):
@@ -198,7 +198,7 @@ class SuggestionWindow(Gtk.Window):
         listData = []
         suggs = get_suggestions()
         for pos, item in enumerate(suggs):
-            listData.append(((pos, get_assem_line(item[0]+1, self.assempath))))
+            listData.append(((pos, get_assem_line(item[0]-1, self.assempath))))
         store = Gtk.ListStore(int, str)
         for item in listData:
             store.append(item)
