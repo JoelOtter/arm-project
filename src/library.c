@@ -381,7 +381,7 @@ int string_compare(char *s1, char *s2) {
 char *get_suggestions(char *s, char *list[], int length) {
 
     int max_suggestion_size = 5 * sizeof(char);
-    char *suggestions = malloc((length * max_suggestion_size) + (20 * sizeof(char)));
+    char *suggestions = calloc((length * max_suggestion_size) + (20 * sizeof(char)), 1);
     char *append;
     
     if ( strlen(s) == 1 ) {

@@ -81,8 +81,10 @@ int main(int argc, char **argv) {
         fwrite(&nothing, 0, 1, fd);
         fclose(fd);
     }
+    
+    overwrite_debug_file();
     if ((fd = fopen("debug_suggestions", "w")) == NULL) {
-            perror("Error opening debug_file!");
+            perror("Error opening debug_suggestions_file!");
             exit(EXIT_FAILURE);
     }
     else{
@@ -176,6 +178,7 @@ int main(int argc, char **argv) {
             strcat(cmd, destpath);
             strcat(cmd, " debug");
             system(cmd);
+            printf("EMU RAN AWAY\n");
         }
         memset(cmd, 0, 50);
         strcat(cmd, "python debugger.py ");

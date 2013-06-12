@@ -70,9 +70,9 @@ int main(int argc, char **argv) {
              }        
         } 
 
-        if (debug) print_to_debug(registers, memory);
-
         if (skip_to_next) continue;
+        
+        if (debug) print_to_debug(registers, memory);
 
         //Decode the fetched instruction.
         current_inst_type = decode(fetched);
