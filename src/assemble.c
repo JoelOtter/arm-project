@@ -10,6 +10,9 @@
 #include "ass_branch.h"
 #include "ass_special.h"
 
+int line_number = 0;
+int wrong = 0;
+
 enum instruction_type   {DATA_PROCESSING,
                          MULTIPLY,
                          SINGLE_DATA_TRANSFER,
@@ -34,7 +37,7 @@ void write_binary(char *path, uint32_t write){
 char *data_processing_op_codes[] = { "add", "sub", "rsb", "and", "eor", "orr", "mov", "tst", "teq", "cmp" };
 unsigned long int data_p_size = (sizeof(data_processing_op_codes)/sizeof(data_processing_op_codes[0]));
 
-enum instruction_type get_instruction_type(char *opcode){ 
+enum instruction_type get_instruction_type(char *opcode){ //TODO
 
     enum instruction_type inst;       
     char first = opcode[0];
@@ -49,7 +52,11 @@ enum instruction_type get_instruction_type(char *opcode){
         inst = SPECIAL;
     } else if ( is_elem_of(opcode, data_processing_op_codes, data_p_size) ) {
         inst = DATA_PROCESSING;
-    } 
+    } else if (debug) {
+        wrong = 1;
+        line_number = (line_number/4) + 1;
+        suggest(opcode, line_number); //TODO from the library
+    }
 
    return inst;
 
@@ -74,6 +81,14 @@ int main(int argc, char **argv) {
         fwrite(&nothing, 0, 1, fd);
         fclose(fd);
     }
+    if ((fd = fopen("debug_suggestions", "w")) == NULL) {
+            perror("Error opening debug_file!");
+            exit(EXIT_FAILURE);
+    }
+    else{
+        fwrite(&nothing, 0, 1, fd);
+        fclose(fd);
+    }
 
     int size = 512;
     char curr_line[size];
@@ -88,7 +103,7 @@ int main(int argc, char **argv) {
     }
             
     int i = 0;
-    
+   
     //This loop is performing the first pass.    
     while(fgets(curr_line, size, fp) != NULL){
     // this is is purely to remove the \n that fgets adds to end of curr_line
@@ -121,7 +136,8 @@ int main(int argc, char **argv) {
     for(table_iter iter = table_begin(&instruction_table); iter != table_end(&instruction_table); iter = table_iter_next(iter)){
 
         strcpy(curr_line, table_iter_label(iter));
-        inst = get_instruction_type(get_mnemonic(curr_line));
+        line_number = table_iter_memory_address(iter); //TODO
+        inst = get_instruction_type(get_mnemonic(curr_line)); //TODO
 
         switch(inst){
             case(DATA_PROCESSING): 
@@ -155,10 +171,12 @@ int main(int argc, char **argv) {
     
     if (debug) {
         char cmd[50];
-        strcat(cmd, "./emulate ./");
-        strcat(cmd, destpath);
-        strcat(cmd, " debug");
-        system(cmd);
+        if (!wrong) {
+            strcat(cmd, "./emulate ./");
+            strcat(cmd, destpath);
+            strcat(cmd, " debug");
+            system(cmd);
+        }
         memset(cmd, 0, 50);
         strcat(cmd, "python debugger.py ");
         strcat(cmd, srcpath);

@@ -53,4 +53,6 @@ int has_sqb_before_comma(char *address);
 
 char* remove_leading_spaces(char *string);
 
+void suggest(char *input_string, int line_number); //part of extensoin
+
 #endif

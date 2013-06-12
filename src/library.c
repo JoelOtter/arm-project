@@ -364,6 +364,83 @@ char* remove_leading_spaces(char *string){
 }
 
 
+// suggestion thing
+int string_compare(char *s1, char *s2) {
+
+    int length = strlen(s1);
+    int count = 0;
+
+    for ( int i = 0; i < length; i++ ) {
+        if ( s1[i] == s2[i] ) {
+            count++;
+        } 
+    }
+    return count;
+}
+
+char *get_suggestions(char *s, char *list[], int length) {
+
+    int max_suggestion_size = 5 * sizeof(char);
+    char *suggestions = malloc((length * max_suggestion_size) + (20 * sizeof(char)));
+    char *append;
+    
+    if ( strlen(s) == 1 ) {
+        strcat(suggestions, " b");
+    } else if ( strlen(s) >= 5 ) {
+        strcat(suggestions, " andeq");
+    } else {
+        char *s2 = malloc ( 5 );
+        strcpy(s2, " ");
+        strcat(s2, s);
+        char *s3 = s++; 
+        for(int i = 0; i < length; i++) {
+            if( string_compare(s, list[i]) >= 2 || string_compare(s2, list[i]) >= 2 || string_compare(s3, list[i]) >= 2 ) {
+                append = list[i];
+                strcat(suggestions, " ");
+                strcat(suggestions, append);
+            }
+        }
+    }
+    return suggestions;
+}
+
+
+void suggest(char *input_string, int line_number) {
+
+ //   char *result = malloc ( 200 * sizeof(char) );
+    char *valid_instructions[] = { "add", "sub", "rsb", "and", "eor", "orr", "mov", 
+                                   "tst", "teq", "cmp", "mul", "mla", "ldr", "str", 
+                                   "beq", "bne", "bge", "blt", "bgt", "ble", "lsl" };
+                                   
+    int valid_instructions_length = sizeof(valid_instructions)/8;
+    char *suggestion = get_suggestions(input_string, valid_instructions, valid_instructions_length);
+    FILE *df;
+    if ((df = fopen("debug_suggestions", "a")) == NULL) {
+        perror("Error opening file!");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(df, "[line %d] error: invalid opcode '%s', did you mean:%s ?\n", line_number, input_string, suggestion);
+    fclose(df);
+  //  return result;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
