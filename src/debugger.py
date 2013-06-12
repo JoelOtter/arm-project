@@ -3,7 +3,7 @@ from gi.repository import Gtk
 import json
 import sys
 
-filename = "debug_file"
+filename = "testfile"
 assemblypath = sys.argv[1]
 
 class DebugWindow(Gtk.Window):
@@ -96,8 +96,8 @@ class DebugWindow(Gtk.Window):
     def create_model_regs(self):
         listData = []
         for position, item in enumerate(self.currentRegs):
-            listData.append(((position, item)))
-        store = Gtk.ListStore(int, int)
+            listData.append(((position, item, self.tohex(item, 32))))
+        store = Gtk.ListStore(int, int, str)
         for item in listData:
             store.append(item)
         return store
@@ -110,13 +110,16 @@ class DebugWindow(Gtk.Window):
         column = Gtk.TreeViewColumn("Value", rendererText, text=1)
         column.set_sort_column_id(1)
         treeView.append_column(column)
+        column = Gtk.TreeViewColumn("Hex Value", rendererText, text=2)
+        column.set_sort_column_id(2)
+        treeView.append_column(column)
         treeView.columns_autosize()
 
     def create_model_mem(self):
         listData = []
         for position, item in enumerate(self.currentMem):
-            listData.append(((hex(item[0]), item[1])))
-        store = Gtk.ListStore(str, int)
+            listData.append(((hex(item[0]), item[1], self.tohex(item[1], 32))))
+        store = Gtk.ListStore(str, int, str)
         for item in listData:
             store.append(item)
         return store
@@ -128,6 +131,9 @@ class DebugWindow(Gtk.Window):
         treeView.append_column(column)
         column = Gtk.TreeViewColumn("Value", rendererText, text=1)
         column.set_sort_column_id(1)
+        treeView.append_column(column)
+        column = Gtk.TreeViewColumn("Hex Value", rendererText, text=2)
+        column.set_sort_column_id(2)
         treeView.append_column(column)
         treeView.columns_autosize()
 
@@ -150,6 +156,73 @@ class DebugWindow(Gtk.Window):
         self.progress.set_fraction(float(num)/float(self.size))
         self.show_all()
 
+    def tohex(self, val, nbits):
+        return hex((val + (1 << nbits)) % (1 << nbits))
+
+class SuggestionWindow(Gtk.Window):
+
+    assempath = ""
+
+    def __init__(self):
+        #Set up window size, title
+        Gtk.Window.__init__(self, title="Assembly failed: " + assemblypath)
+        self.set_size_request(800, 500)
+        box = Gtk.Box(spacing=5)
+        self.add(box)
+        self.assempath = fix_assem_file(assemblypath)
+
+        #The scrolling list of instructions
+        instrStore = self.create_model_instrs()
+        self.treeView = Gtk.TreeView(instrStore)
+        self.treeView.set_rules_hint(True)
+        self.create_columns_instrs(self.treeView)
+        self.treeView.get_selection().connect("changed", self.on_tree_selection_changed)
+        sw = Gtk.ScrolledWindow()
+        sw.set_size_request(200, 0)
+        box.pack_start(sw, False, False, 0)
+        sw.add(self.treeView)
+
+        #The title and UI box
+        infobox = Gtk.Box(spacing=20, orientation=Gtk.Orientation.VERTICAL)
+        box.pack_start(infobox, True, True, 5)
+        self.title = Gtk.Label("<span size='25000'><b>Error in assembly. Some suggestions...</b></span>")
+        self.title.set_alignment(0, 0)
+        self.title.set_use_markup(True)
+        self.label1 = Gtk.Label()
+        self.label2 = Gtk.Label()
+        infobox.pack_start(self.title, False, False, 5)
+        infobox.pack_start(self.label1, True, True, 5)
+        infobox.pack_start(self.label2, True, True, 5)
+
+    def create_model_instrs(self):
+        listData = []
+        suggs = get_suggestions()
+        for pos, item in enumerate(suggs):
+            listData.append(((pos, get_assem_line(item[0]+1, self.assempath))))
+        store = Gtk.ListStore(int, str)
+        for item in listData:
+            store.append(item)
+        return store
+
+    def create_columns_instrs(self, treeView):
+        rendererText = Gtk.CellRendererText()
+        column = Gtk.TreeViewColumn("Instruction", rendererText, text=1)
+        column.set_sort_column_id(0)
+        treeView.append_column(column)
+        treeView.columns_autosize()
+
+    def on_tree_selection_changed(self, selection):
+        model, treeIter = selection.get_selected()
+        self.rebuild(model[treeIter][0])
+
+    def rebuild(self, num):
+        sugLine = get_suggestions()[num]
+        self.label1.set_text("<span size='15000'>You used an incorrect command, <b>" + sugLine[1] + "</b>.</span>")
+        self.label1.set_use_markup(True)
+        self.label2.set_text("<span size='15000'>Consider using: <b>" + sugLine[2] + "</b></span>")
+        self.label2.set_use_markup(True)
+        self.show_all()
+
 def get_instrs(path):
     debugfile = open(filename)
     instrs = []
@@ -161,17 +234,30 @@ def get_instrs(path):
 
 def get_outp_line(lineNo):
     outpfile = open(filename)
+    toreturn = None
     for i, line in enumerate(outpfile):
-        if (i == lineNo): return json.loads(line)
+        if (i == lineNo): 
+            toreturn = json.loads(line)
+            break
     outpfile.close()
-    return None
+    return toreturn
 
 def get_assem_line(lineNo, path):
     assemblyfile = open(path)
+    toreturn = None
     for i, line in enumerate(assemblyfile):
-        if (i == lineNo): return line
+        if (i == lineNo):
+            toreturn = line
+            break
     assemblyfile.close()
-    return None
+    return toreturn
+
+def get_suggestions():
+    suggfile = open('debug_suggestions')
+    results = []
+    for i, line in enumerate(suggfile):
+        results.append(json.loads(line))
+    return results
 
 def fix_assem_file(filepath):
     with open(filepath) as assemblyfile:
@@ -185,7 +271,9 @@ def fix_assem_file(filepath):
         newassembly.close()
         return "fixedassemble"
 
-win = DebugWindow()
+if get_outp_line(0) == None:
+    win = SuggestionWindow()
+else: win = DebugWindow()
 win.connect("delete-event", Gtk.main_quit)
 win.show_all()
 Gtk.main()
