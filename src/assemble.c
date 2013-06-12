@@ -174,18 +174,18 @@ int main(int argc, char **argv) {
     printf("\n");
     
     if (debug) {
-        char cmd[50];
+        char cmd[100];
         if (!wrong) {
-            strcat(cmd, "./emulate ./");
+            strcat(cmd, "./emulate ./\"");
             strcat(cmd, destpath);
-            strcat(cmd, " debug");
+            strcat(cmd, "\" debug");
             system(cmd);
             printf("EMU RAN AWAY\n");
         }
         memset(cmd, 0, 50);
-        strcat(cmd, "python debugger.py ");
+        strcat(cmd, "python debugger.py \"");
         strcat(cmd, srcpath);
-        strcat(cmd, " &");
+        strcat(cmd, "\" &");
         system(cmd);
     }
     // GUI call with srcpath

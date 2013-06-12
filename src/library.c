@@ -406,7 +406,8 @@ char *get_suggestions(char *s, char *list[], int length) {
 
     char *valid_instructions[] = { "add", "sub", "rsb", "and", "eor", "orr", "mov", 
                                    "tst", "teq", "cmp", "mul", "mla", "ldr", "str", 
-                                   "beq", "bne", "bge", "blt", "bgt", "ble", "lsl" };
+                                   "beq", "bne", "bge", "blt", "bgt", "ble", "lsl",
+                                   "bal", "b"};
                                    
     int valid_instructions_length = sizeof(valid_instructions)/8;
 
