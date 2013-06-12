@@ -37,6 +37,8 @@ void print_registers(int32_t *registers);
 
 void print_non_zero_memory(unsigned char *memory);
 
+void overwrite_debug_file(void);
+
 void print_to_debug(int32_t *registers, unsigned char *memory);
 
 int reg_from_string(char *rstring);

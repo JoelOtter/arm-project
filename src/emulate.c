@@ -28,7 +28,12 @@ int main(int argc, char **argv) {
 
     assert(argc == 2 || argc == 3);
 
-    debug = (argc == 3);
+    if (argc == 3) {
+        debug = 1;
+        overwrite_debug_file();
+    } else {
+        debug = 0;
+    }
 
     load_binary(argv[1]);
     int32_t *PC = &registers[15];
@@ -80,9 +85,10 @@ int main(int argc, char **argv) {
         *PC += 4; 
 
     }
-
-    print_registers(registers);
-    print_non_zero_memory(memory);
+    if (!debug) {
+        print_registers(registers);
+        print_non_zero_memory(memory);
+    }
 
     free(memory);
     free(registers);

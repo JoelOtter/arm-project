@@ -21,6 +21,7 @@ table symbol_table;
 table instruction_table;
 
 uint32_t *add_afters;
+int debug;
 
 void write_binary(char *path, uint32_t write){
     FILE *fp;
@@ -55,7 +56,9 @@ enum instruction_type get_instruction_type(char *opcode){
 }  
 
 int main(int argc, char **argv) {
-    assert(argc == 3);
+    assert(argc == 3 ||  argc == 4);
+    
+    debug = (argc == 4);
     
     char *srcpath = argv[1];
     char *destpath = argv[2];
@@ -64,7 +67,7 @@ int main(int argc, char **argv) {
     FILE *fd;
     char nothing = '\0';
     if ((fd = fopen(destpath, "w")) == NULL) {
-            perror("Error opening file!");
+            perror("Error opening debug_file!");
             exit(EXIT_FAILURE);
     }
     else{
@@ -80,7 +83,7 @@ int main(int argc, char **argv) {
     table_constructor(&instruction_table);
     
     if ((fp = fopen(srcpath, "r")) == NULL) {
-            perror("Error opening file!");
+            perror("Error opening source file!");
             exit(EXIT_FAILURE);
     }
             
@@ -149,4 +152,18 @@ int main(int argc, char **argv) {
     }
 
     printf("\n");
+    
+    if (debug) {
+        char cmd[50];
+        strcat(cmd, "./emulate ./");
+        strcat(cmd, destpath);
+        strcat(cmd, " debug");
+        system(cmd);
+        memset(cmd, 0, 50);
+        strcat(cmd, "python debugger.py ");
+        strcat(cmd, srcpath);
+        strcat(cmd, " &");
+        //system(cmd);
+    }
+    // GUI call with srcpath
 }

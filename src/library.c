@@ -111,12 +111,9 @@ char *itoa(uint i, char b[]){
     return b;
 }
 
-void print_to_debug(int32_t *registers, unsigned char *memory) {
-    // register value b= 10 digits = 10 chars *15 cos 15 registers
-    // 16 chars for address + 10 chars for content
-    FILE *df;
-
-    char nothing = '\0';
+void overwrite_debug_file(void) {
+	FILE *df;
+	char nothing = '\0';
     if ((df = fopen("debug_file", "w")) == NULL) {
         perror("Error opening file!");
         exit(EXIT_FAILURE);
@@ -124,6 +121,12 @@ void print_to_debug(int32_t *registers, unsigned char *memory) {
         fwrite(&nothing, 0, 1, df);
         fclose(df);
     }
+}
+
+void print_to_debug(int32_t *registers, unsigned char *memory) {
+    // register value b= 10 digits = 10 chars *15 cos 15 registers
+    // 16 chars for address + 10 chars for content
+    FILE *df;
 
     if ((df = fopen("debug_file", "a")) == NULL) {
         perror("Error opening file!");
@@ -161,7 +164,7 @@ void print_to_debug(int32_t *registers, unsigned char *memory) {
     }
 
 
-    fprintf(df, "]]");
+    fprintf(df, "]]\n");
 
     fclose(df);
 }
