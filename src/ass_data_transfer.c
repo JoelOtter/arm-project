@@ -4,7 +4,6 @@
 #include <assert.h>
 #include "library.h"
 #include "ass_symbol_table.h"
-#include "ass_data_processing.h"
 #include "assemble.h"
 
 table instruction_table;
@@ -18,34 +17,23 @@ uint32_t Rd = 0;
 uint32_t Offset = 0;
 uint32_t condition = 0;
 
-static uint32_t get_shifted_register(char* operand2);
+const int SDT_mask = 67108864;
+
+uint32_t get_shifted_register(char* operand2);
 
 uint32_t build_instruction(void){
 
-    uint32_t result = 67108864; //call this SDT_mask or something?
+    uint32_t result = SDT_mask; //call this SDT_mask or something?
     condition = 14;
     // = 00000100000000000000000000000000
-  //  printf("I = %i\n", I);
-  //  printf("P = %i\n", P);
-  //  printf("U = %i\n", U);
-  //  printf("L = %i\n", L);
-    //rintf("Rn = %i\n", I);
-    //printf("I = %i\n", I);
-    //printf("I = %i\n", I);
-    //printf("I = %i\n", I);
-        printf("U = %i\n", U);
 
     result |= (condition << 28); //cond
     result |= (In << 25);  //01I p
     result |= (P << 24);  //P
-    printf("U = %i\n", U);
     result |= (U << 23);  //U
     result |= (L << 20);  //L
-    print_bits(result);
     result |= (Rn << 16); //Rn
-    print_bits(result);
     result |= (Rd << 12); //Rd
-    print_bits(result);
     result |= Offset;
     return result;
 
@@ -114,11 +102,10 @@ void calculate_offset(char *offset_str){
      // offset_str is of form {+/-}Rm{,<shift>}
     U = !(offset_str[0] == '-'); // if - Rm <shift>, U = 0;
     Offset = get_shifted_register(offset_str); // calls function in data_processing
-    printf("Offset = "); print_bits(Offset);
 }
 
 
-static uint32_t get_shifted_register(char* operand2) {
+uint32_t get_shifted_register(char* operand2) {
     //PRE: operand2 is of form: Rm, shift_type {#expression or register}
     //POST: Returns contents of Rm shifted by the shift type by a degree
     //      specified by the constant expression or register. 
@@ -140,7 +127,7 @@ static uint32_t get_shifted_register(char* operand2) {
     if(shift_name[0] == '\0' && L == 0){
         return (0 + reg_from_string(Rm)); 
     } 
-;
+
     shift_name_pointer = remove_leading_spaces(shift_name);
     rest_pointer = remove_leading_spaces(rest);
 
@@ -162,20 +149,26 @@ uint32_t ass_data_transfer(char *given, int place){
 
     char *mnemonic = get_mnemonic(given);
     char *args = get_rest(given);
-    char *address = calloc(50,1);
-    char rd_str[20];
+    char rd_str[10];
+    char address[30];
+
+    char *rd_strp = rd_str;
+    char *addressp = address;
     uint32_t result;
     
     
     sscanf(args, "%[^','],%[^\n]", rd_str, address);
-    address = remove_leading_spaces(address);
-    Rd = reg_from_string(rd_str);
+    addressp = remove_leading_spaces(address);
+    Rd = reg_from_string(rd_strp);
     L = (!(strcmp(mnemonic, "str") == 0));
+
+    free(mnemonic);
+    free(args);
 
     if (address[0] == '='){
         In = 1;
         //address is of form <=expression> (ldr only).
-        uint32_t location = str_to_hex(address);
+        uint32_t location = str_to_hex(addressp);
 
         if (location <= 0xff){
             return do_mov(Rd, location);
@@ -183,16 +176,17 @@ uint32_t ass_data_transfer(char *given, int place){
             return place_at_end(location, place);
         }
 
-
-    } else if (!is_immediate(address)){
+    } else if (!is_immediate(addressp)){
         In = 0;
         // address is of form: - [Rn,<#expression>]
         //                     - [Rn]
 
-        char *base_reg = malloc(15);
-        char *offset_str = malloc(15);
+        char base_reg[15];
+        char offset_str[15];
 
-        if (is_post_indexed(address)){ //CHECK THIS IS RIGHT
+        char *base_regp;
+
+        if (is_post_indexed(addressp)){ //CHECK THIS IS RIGHT
             // Post-indexing
             // Address is of form: - [Rn], <#expression>
             //                     - [Rn], {+/-}Rm{,<shift>}
@@ -214,21 +208,19 @@ uint32_t ass_data_transfer(char *given, int place){
 
             sscanf(address, "%[^','],%[^\n]", base_reg, offset_str);
 
-            if(!has_comma(address)){
+            if(!has_comma(addressp)){
                 U = 1;
                 Offset = 0;
             } else {
                 calculate_offset(offset_str);
             }
-            base_reg = remove_leading_spaces(base_reg);
-            Rn = reg_from_string(base_reg);
+            base_regp = remove_leading_spaces(base_reg);
+            Rn = reg_from_string(base_regp);
 
             result = build_instruction();
 
         }
 
-        free(base_reg);
-        free(offset_str);
         return result;
 
     } else {
@@ -239,7 +231,3 @@ uint32_t ass_data_transfer(char *given, int place){
     
     return result;
 }
-
-
-
-

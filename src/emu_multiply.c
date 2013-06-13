@@ -50,7 +50,6 @@ void multiply(uint32_t instruction) {
 
     // if accumulate bit is set, then also add value of Rn
     if ((instruction >> 21) & mask1) {
-        //printf("ACCUMULATOR\n");
         temp += registers[Rn];
     } 
     registers[Rd] = temp;

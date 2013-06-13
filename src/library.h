@@ -57,4 +57,10 @@ void suggest(char *input_string, int line_number); //part of extensoin
 
 int is_valid_instruction(char *string);
 
+uint32_t shift_immediate(char* shift_name, char* constant);
+
+uint32_t shift_register(char* shift_name, char* rs);
+
+uint32_t get_shift_type(char *shift_type);
+
 #endif

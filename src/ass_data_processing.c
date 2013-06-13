@@ -27,6 +27,13 @@ char Rd[2];
 char Rm[2];
 char operand2[15];
 
+int is_shifted(char *operand2);
+uint32_t get_unshifted_register(char* operand2) ;
+uint32_t get_shifted_register2(char* operand2);
+uint32_t shift_immediate(char* shift_name, char* constant);
+uint32_t shift_register(char* shift_name, char* rs);
+uint32_t get_shift_type(char *shift_type);
+
 enum data_instruction_type get_type(char *mnemonic) {
 
     enum data_instruction_type inst;
@@ -148,7 +155,7 @@ uint32_t get_operand2(char *operand2) {
         if ( !is_shifted(operand2) ) {
             operand2_i = get_unshifted_register(operand2);
         } else { 
-            operand2_i = get_shifted_register(operand2);
+            operand2_i = get_shifted_register2(operand2);
         }
     }
 
@@ -163,8 +170,8 @@ uint32_t get_unshifted_register(char* operand2) {
 
 int is_shifted(char *operand2) {
 
-     char first[30];
-     char second[30];
+     char first[30] = "";
+     char second[30] = "";
      char *second2;
 
      sscanf(operand2, "%[^','],%[^\n]", first, second);
@@ -173,7 +180,7 @@ int is_shifted(char *operand2) {
      return !(second2[0] == '\0');
 }
 
-uint32_t get_shifted_register(char* operand2) {
+uint32_t get_shifted_register2(char* operand2) {
 
     uint32_t rmI;
     char shift_name[5];
@@ -197,46 +204,6 @@ uint32_t get_shifted_register(char* operand2) {
     operand2_i |= rmI;
     
     return operand2_i;
-}
-
-uint32_t shift_immediate(char* shift_name, char* constant) {
-
-    uint32_t result = 0;
-    uint32_t immediate = atoi(constant); // might not be unsigned
-    uint32_t shift_type = get_shift_type(shift_name);
-
-    if ( immediate >=64 ) {
-        perror("Error: numeric constant cannot be represented\n");
-        exit(EXIT_FAILURE);
-    }
-
-    result = ( immediate << 7 ) | (shift_type << 5 );
-
-    return result;
-}
-
-uint32_t shift_register(char* shift_name, char* rs) {
-
-    uint32_t result = 0;
-    uint32_t rsI = reg_from_string(rs);
-    uint32_t shift_type = get_shift_type(shift_name);
-    
-    result = (rsI << 8 ) | (shift_type << 5) | (1 << 4);
-
-    return result;
-}
-
-uint32_t get_shift_type(char *shift_type){
-
-    if (!(strcmp(shift_type, "lsl"))) {
-        return 0;
-    } else if (!(strcmp(shift_type, "lsr") )) {
-        return 1;
-    } else if (!(strcmp(shift_type, "asr"))) {
-        return 2;
-    }
- 
-    return 3;
 }
 
 void execute_result_inst(char *mnemonic, char *rest) {
@@ -284,6 +251,9 @@ uint32_t ass_data_processing(char *instruction) {
     operand2_i = get_operand2(operand2);
 
     result = (cond << 28) | (I << 25) | (opcode << 21) | (S << 20) | (RnI << 16) | (RdI << 12) | operand2_i;
+
+    free(mnemonic);
+    free(rest);
    
     return result;
 }

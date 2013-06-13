@@ -30,5 +30,8 @@ uint32_t ass_multiply(char *instruction) {
 
     result |= (RdI << 16) | (RnI << 12) | (RsI << 8) | (RmI & mask4);
 
+    free(mnemonic);
+    free(rest);
+
     return result;
 }

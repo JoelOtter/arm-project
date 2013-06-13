@@ -29,7 +29,6 @@ uint32_t ass_branch(char *instruction){
     suffix[0] = mnemonic[1];
     suffix[1] = mnemonic[2];
     suffix[2] = mnemonic[3];
-    printf("%s\n", suffix);
     if (!strcmp(suffix, "eq")) {
         cond = 0;
     } else if (!strcmp(suffix, "ne")) {
@@ -51,6 +50,9 @@ uint32_t ass_branch(char *instruction){
     int32_t current_address = get_memory_address(&instruction_table, instruction);
         
     offset = label_address - current_address - 8; //Magi No is pipeline offset 
+
+    free(mnemonic);
+    free(rest);
         
     return(get_result(cond, offset));
 

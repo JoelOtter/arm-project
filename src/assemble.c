@@ -118,12 +118,10 @@ int main(int argc, char **argv) {
         //If the current line is a label, insert it into symbol table
         if (curr_line[strlen(curr_line) -1] == ':') {
             curr_line[strlen(curr_line)-1] = 0;
-            printf("symbol table ins, (%s), %d\n", curr_line, i);
             table_insert_end(&symbol_table, curr_line, i);
         } else if(curr_line[0] == ' ' || curr_line[0] == 0){
             continue;
         } else {
-            printf("instruction table ins, (%s), %d\n", curr_line, i);
             table_insert_end(&instruction_table, curr_line,i);
             i+=4;
         }     
@@ -141,13 +139,12 @@ int main(int argc, char **argv) {
 
         strcpy(curr_line, table_iter_label(iter));
         line_number = table_iter_memory_address(iter); //TODO
-        inst = get_instruction_type(get_mnemonic(curr_line)); //TODO
+        char *mnemonic = get_mnemonic(curr_line);
+        inst = get_instruction_type(mnemonic); //TODO
 
         switch(inst){
             case(DATA_PROCESSING): 
-                printf("IterNO: %d data procesing %s \n", count, get_mnemonic(curr_line));
                 result = ass_data_processing(curr_line);
-                printf("%x\n", result);
                 break;
             case(MULTIPLY):
                  result = ass_multiply(curr_line);
@@ -165,22 +162,20 @@ int main(int argc, char **argv) {
 
         count++;
         write_binary(destpath, result);
+        free(mnemonic);
     }
 
     for(int i=0; add_afters[i] != 0; i++){
         write_binary(destpath, add_afters[i]);
     }
-
-    printf("\n");
     
     if (debug) {
-        char cmd[100];
+        char cmd[100] = "";
         if (!wrong) {
             strcat(cmd, "./emulate ./\"");
             strcat(cmd, destpath);
             strcat(cmd, "\" debug");
             system(cmd);
-            printf("EMU RAN AWAY\n");
         }
         memset(cmd, 0, 50);
         strcat(cmd, "python debugger.py \"");
@@ -188,5 +183,8 @@ int main(int argc, char **argv) {
         strcat(cmd, "\" &");
         system(cmd);
     }
-    // GUI call with srcpath
+
+    table_destroy(&symbol_table);
+    table_destroy(&instruction_table);
+    free(add_afters);
 }

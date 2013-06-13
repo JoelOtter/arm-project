@@ -17,17 +17,16 @@ const int NUM_REGISTERS = 17;
 int carryout;
 
 char *get_mnemonic(char *instruction){
-    char *result = malloc(30);
-    sscanf(instruction, "%s", result);
-    return result;
+    char *mnemonic_result = malloc(10);
+    sscanf(instruction, "%s", mnemonic_result);
+    return mnemonic_result;
 }
 
 char *get_rest(char *instruction){
-    char *result = malloc(5);
-    sscanf(instruction, "%*s %[^\n]", result);
-    return result;
+    char *rest_result = malloc(30);
+    sscanf(instruction, "%*s %[^\n]", rest_result);
+    return rest_result;
 }
-
 
 uint32_t get_from_memory(unsigned char *memory, int start) {
 
@@ -68,7 +67,7 @@ void print_registers(int32_t *registers){
 
 void print_non_zero_memory(unsigned char *memory) {
     printf("Non-zero memory:\n");
-    for (int i = 0; i< 65536; i+=4) {
+    for (int i = 0; i< SIZE_OF_MEMORY; i+=4) {
         uint32_t memory_content = get_from_memory(memory, i);
         if (memory_content != 0) {
             printf("0x%08x: 0x%08x\n", i, memory_content);
@@ -77,7 +76,7 @@ void print_non_zero_memory(unsigned char *memory) {
 }
 
 int has_next_non_zero(unsigned char *memory, int from) {
-    for (int i = from+4; i< 65536; i+=4) {
+    for (int i = from+4; i< SIZE_OF_MEMORY; i+=4) {
         uint32_t memory_content = get_from_memory(memory, i);
         if (memory_content != 0) {
             return 1;
@@ -143,7 +142,7 @@ void print_to_debug(int32_t *registers, unsigned char *memory) {
     }
     fprintf(df, "],[");
 
-    for (int i = 0; i< 65536; i+=4) {
+    for (int i = 0; i< SIZE_OF_MEMORY; i+=4) {
         uint32_t memory_content = get_from_memory(memory, i);
         if (memory_content != 0) {
             
@@ -354,17 +353,6 @@ int is_post_indexed(char *address){
     return post_indexed;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 // suggestion thing
 int string_compare(char *s1, char *s2) {
 
@@ -379,17 +367,20 @@ int string_compare(char *s1, char *s2) {
     return count;
 }
 
+char *suggestions;
+
 char *get_suggestions(char *s, char *list[], int length) {
 
     int max_suggestion_size = 5 * sizeof(char);
-    char *suggestions = calloc((length * max_suggestion_size) + (20 * sizeof(char)), 1);    char *append;
+    suggestions = calloc((length * max_suggestion_size) + (20 * sizeof(char)), 1);
+    char *append;
     
     if ( strlen(s) == 1 ) {
         strcat(suggestions, "b");
     } else if ( strlen(s) >= 5 ) {
         strcat(suggestions, "andeq");
     } else {
-        char *s2 = malloc ( 5 );
+        char s2[5];
         strcpy(s2, " ");
         strcat(s2, s);
         char *s3 = s++; 
@@ -405,19 +396,15 @@ char *get_suggestions(char *s, char *list[], int length) {
 }
 
 
-
 char *valid_instructions[] = { "add", "sub", "rsb", "and", "eor", "orr", "mov", 
                                    "tst", "teq", "cmp", "mul", "mla", "ldr", "str", 
                                    "beq", "bne", "bge", "blt", "bgt", "ble", "lsl",
                                    "bal", "b"};
 
-int valid_instructions_length = sizeof(valid_instructions) / 8;
- 
- void suggest(char *input_string, int line_number) {
+int valid_instructions_length = sizeof(valid_instructions)/8;
 
- //   char *result = malloc ( 200 * sizeof(char) );
+void suggest(char *input_string, int line_number) {
 
-    int valid_instructions_length = sizeof(valid_instructions)/8;
     char *suggestion = get_suggestions(input_string, valid_instructions, valid_instructions_length);
     FILE *df;
     if ((df = fopen("debug_suggestions", "a")) == NULL) {
@@ -426,7 +413,7 @@ int valid_instructions_length = sizeof(valid_instructions) / 8;
     }
     fprintf(df, "[%d, \"%s\", \"%s\"]\n", line_number, input_string, suggestion);
     fclose(df);
-  //  return result;
+    free(suggestions);  //  return result;
 }
 
 int is_valid_instruction(char *string) {
@@ -435,8 +422,6 @@ int is_valid_instruction(char *string) {
 
 int is_elem_of(char *search_string, char *list[] , unsigned long int len) {
 
-  //  int len = sizeof(list);  
-    printf("%lu\n", len);
     int i;
 
     for(i = 0; i < len; ++i) {
@@ -459,7 +444,42 @@ char* remove_leading_spaces(char *string){
 
 }
 
+uint32_t shift_immediate(char* shift_name, char* constant) {
 
+    uint32_t result = 0;
+    uint32_t immediate = atoi(constant); // might not be unsigned
+    uint32_t shift_type = get_shift_type(shift_name);
 
+    if ( immediate >=64 ) {
+        perror("Error: numeric constant cannot be represented\n");
+        exit(EXIT_FAILURE);
+    }
 
+    result = ( immediate << 7 ) | (shift_type << 5 );
 
+    return result;
+}
+
+uint32_t shift_register(char* shift_name, char* rs) {
+
+    uint32_t result = 0;
+    uint32_t rsI = reg_from_string(rs);
+    uint32_t shift_type = get_shift_type(shift_name);
+    
+    result = (rsI << 8 ) | (shift_type << 5) | (1 << 4);
+
+    return result;
+}
+
+uint32_t get_shift_type(char *shift_type){
+
+    if (!(strcmp(shift_type, "lsl"))) {
+        return 0;
+    } else if (!(strcmp(shift_type, "lsr") )) {
+        return 1;
+    } else if (!(strcmp(shift_type, "asr"))) {
+        return 2;
+    }
+ 
+    return 3;
+}

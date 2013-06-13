@@ -210,24 +210,4 @@ static enum instruction_type decode(uint32_t instruction){ //Instruction is 32 b
 
    return inst;
 
-}  
-
-// Functions for testing!!!
-
-void print_8_bits(uint8_t x) {
-    
-    int i;
-
-    uint8_t mask = 1 << 7;
-
-    for(i=0; i<8; ++i) {
-        if((x & mask) == 0){
-            printf("0");
-        }else {
-            printf("1");
-        }
-        mask >>= 1;
-    }
-
-    printf("\n");
 }

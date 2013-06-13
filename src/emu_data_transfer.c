@@ -6,6 +6,11 @@
 #include "emulate.h"
 #include "library.h"
 
+const int pins_0_9 = 0x20200000;
+const int pins_10_19 = 0x20200004;
+const int pins_20_29 = 0x20200008;
+const int LED_off = 0x20200028;
+const int LED_on = 0x2020001c;
 
 static uint32_t get_operand_2(uint32_t instruction) {
     //Operand2 is either immediate (in which case we just take the value and extend)
@@ -60,17 +65,16 @@ static void load(uint32_t P, uint32_t U, uint32_t offset, uint32_t base_reg, uin
     if (!U) offset_new = offset_new * (-1);
     uint32_t reg_value = registers[base_reg];
     if (P) reg_value += offset_new;
-    //printf("0x%08x\n", reg_value);
     if (reg_value + 3 < SIZE_OF_MEMORY) registers[dest_reg] = get_from_memory(memory, reg_value);
-    else if (reg_value == 0x20200000) {
+    else if (reg_value == pins_0_9) {
         printf("One GPIO pin from 0 to 9 has been accessed\n");
         registers[dest_reg] = reg_value;
     }
-    else if (reg_value == 0x20200004) {
+    else if (reg_value == pins_10_19) {
         printf("One GPIO pin from 10 to 19 has been accessed\n"); 
         registers[dest_reg] = reg_value;
     }
-    else if (reg_value == 0x20200008) {
+    else if (reg_value == pins_20_29) {
         printf("One GPIO pin from 20 to 29 has been accessed\n");
         registers[dest_reg] = reg_value;
     }
@@ -84,11 +88,11 @@ static void store(uint32_t P, uint32_t U, uint32_t offset, uint32_t base_reg, ui
     uint32_t reg_value = registers[base_reg];
     if (P) reg_value += offset_new;
     if (reg_value + 3 < SIZE_OF_MEMORY) write_to_memory(memory, reg_value, registers[dest_reg]);
-    else if (reg_value == 0x20200000) printf("One GPIO pin from 0 to 9 has been accessed\n");
-    else if (reg_value == 0x20200004) printf("One GPIO pin from 10 to 19 has been accessed\n");
-    else if (reg_value == 0x20200008) printf("One GPIO pin from 20 to 29 has been accessed\n");
-    else if (reg_value == 0x20200028) printf("LED OFF!\n");
-    else if (reg_value == 0x2020001c) printf("LED ON!\n");
+    else if (reg_value == pins_0_9) printf("One GPIO pin from 0 to 9 has been accessed\n");
+    else if (reg_value == pins_10_19) printf("One GPIO pin from 10 to 19 has been accessed\n");
+    else if (reg_value == pins_20_29) printf("One GPIO pin from 20 to 29 has been accessed\n");
+    else if (reg_value == LED_off) printf("LED OFF!\n");
+    else if (reg_value == LED_on) printf("LED ON!\n");
     else printf("Error: Out of bounds memory access at address 0x%08x\n", reg_value);
     if (!P) registers[base_reg] += offset_new;
 }
@@ -104,4 +108,3 @@ void single_data_transfer(uint32_t instruction){
     if (L) load(P, U, offset, base_reg, dest_reg);
     else store(P, U, offset, base_reg, dest_reg);
 }
-

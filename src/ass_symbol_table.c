@@ -24,7 +24,6 @@ void table_free_elem(struct table_elem *elem) {
     free(elem);
 }
 
-
 void table_constructor(struct table *table) {
     //initialises table
     table->header         = table_alloc_elem();
@@ -48,8 +47,6 @@ static void insert_elem(struct table *table, table_iter iter, char *label, uint3
     
     iter->prev->next = new_elem;
     iter->prev = new_elem;
-
-    printf("\n");
 
     //increment size of table
     table->size++;
@@ -103,7 +100,6 @@ char* get_label(struct table *table, uint32_t memory_address) {
     return not_found_exception;
 
 }
-
 
 int32_t get_memory_address(struct table *table, char *label) {
 
