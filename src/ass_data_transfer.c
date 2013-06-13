@@ -4,9 +4,52 @@
 #include <assert.h>
 #include "library.h"
 #include "ass_symbol_table.h"
+#include "ass_data_processing.h"
 #include "assemble.h"
 
 table instruction_table;
+
+uint32_t In = 0;
+uint32_t P = 0;
+uint32_t U = 0;
+uint32_t L = 0;
+uint32_t Rn = 0;
+uint32_t Rd = 0;
+uint32_t Offset = 0;
+uint32_t condition = 0;
+
+static uint32_t get_shifted_register(char* operand2);
+
+uint32_t build_instruction(void){
+
+    uint32_t result = 67108864; //call this SDT_mask or something?
+    condition = 14;
+    // = 00000100000000000000000000000000
+  //  printf("I = %i\n", I);
+  //  printf("P = %i\n", P);
+  //  printf("U = %i\n", U);
+  //  printf("L = %i\n", L);
+    //rintf("Rn = %i\n", I);
+    //printf("I = %i\n", I);
+    //printf("I = %i\n", I);
+    //printf("I = %i\n", I);
+        printf("U = %i\n", U);
+
+    result |= (condition << 28); //cond
+    result |= (In << 25);  //01I p
+    result |= (P << 24);  //P
+    printf("U = %i\n", U);
+    result |= (U << 23);  //U
+    result |= (L << 20);  //L
+    print_bits(result);
+    result |= (Rn << 16); //Rn
+    print_bits(result);
+    result |= (Rd << 12); //Rd
+    print_bits(result);
+    result |= Offset;
+    return result;
+
+}
 
 uint32_t str_to_hex(char *xstr){
     return strtol(&xstr[1], NULL, 0);
@@ -23,118 +66,178 @@ uint32_t do_mov(uint32_t rd, uint32_t location){
     return result;
 }
 
-uint32_t direct_register(uint32_t rd, uint32_t rn, int load){
+uint32_t direct_register(void){
     uint32_t result = 0;
     result += (14 << 28); //cond
     result += (2 << 25);  //01I
     result += (3 << 23);  //PU
-    result += (load << 20);  //L
-    result += (rn << 16); //Rn
-    result += (rd << 12); //Rd
+    result += (L << 20);  //L
+    result += (Rn << 16); //Rn
+    result += (Rd << 12); //Rd
     return result;
 }
 
-uint32_t place_at_end(uint32_t rd, uint32_t value, int load, int place){
+uint32_t place_at_end(uint32_t value, int place){
+    
     int num_in = 0;
-    for (int i=0; add_afters[i] != 0; i+=4){
+    for (int x=0; add_afters[x] != 0; x+=4){
         ++num_in;
     }
     
     add_afters[num_in] = value;
 
     uint32_t address_of_last_instruction = (table_end(&instruction_table))->prev->memory_address;
+    Offset = address_of_last_instruction - (place + 8);
+    Offset += 4;
+    Offset += (num_in * 4);
 
-    //char *last_value = (table_end(&instruction_table))->label;
+    P = 1;
+    U = 1;
+    In = 0;
+    Rn = 15; //Base register should be the PC = reg[15]. Enum PC?
 
-
-    uint32_t offset = address_of_last_instruction - (place + 8);
-    offset += 4;
-    offset += (num_in * 4);
-    uint32_t result = 0;
-    result += (14 << 28); //cond
-    result += (2 << 25);  //01I
-    result += (3 << 23);  //PU
-    result += (load << 20);  //L
-    result += (15 << 16); //Rn
-    result += (rd << 12); //Rd
-    result += offset;
-    return result;
+    return build_instruction();
 }
 
-uint32_t do_offset(uint32_t rd, uint32_t rn, uint32_t offset, int load, int pre, int imm){
-    assert(offset <= 4095);
-    uint32_t result = 0;
-    result += (14 << 28); //cond
-    result += ((2+imm) << 25);  //01I
-    result += (pre << 24);
-    result += (1 << 23);  //PU
-    result += (load << 20);  //L
-    result += (rn << 16); //Rn
-    result += (rd << 12); //Rd
-    result += offset;     //offset
-    return result;
-}
+void calculate_offset(char *offset_str){
+// Determines whether offset is #expression or {+/-}Rm{,<shift>}
 
-char* remove_leading_space(char *address){
-
-    if(address[0] == ' '){
-       return &(address[1]);
+    offset_str = remove_leading_spaces(offset_str);
+    //In = 1; // Might have to go after the if??
+    if(offset_str[0] == '#'){
+        In = 0;
+        U = 1;
+        Offset = atoi(offset_str+1); //CHECK DEF OF atoi!!
+        return;
     }
+    In = 1;
+     // offset_str is of form {+/-}Rm{,<shift>}
+    U = !(offset_str[0] == '-'); // if - Rm <shift>, U = 0;
+    Offset = get_shifted_register(offset_str); // calls function in data_processing
+    printf("Offset = "); print_bits(Offset);
+}
 
-    return address;
+
+static uint32_t get_shifted_register(char* operand2) {
+    //PRE: operand2 is of form: Rm, shift_type {#expression or register}
+    //POST: Returns contents of Rm shifted by the shift type by a degree
+    //      specified by the constant expression or register. 
+   
+    uint32_t rmI;
+    char shift_name[5];
+    char rest[10];
+    uint32_t operand2_i;
+    char *shift_name_pointer;
+    char *rest_pointer;
+    char Rm[2];
+
+    shift_name[0] = '\0';
+    rest[0] = '\0';
+
+    sscanf(operand2, "%[^','],%s %s", Rm, shift_name, rest);
+    remove_leading_spaces(Rm);
+    
+    if(shift_name[0] == '\0' && L == 0){
+        return (0 + reg_from_string(Rm)); 
+    } 
+;
+    shift_name_pointer = remove_leading_spaces(shift_name);
+    rest_pointer = remove_leading_spaces(rest);
+
+
+    if ( rest[0] == '#') {
+        In = 1;
+        operand2_i = shift_immediate(shift_name_pointer, &(rest_pointer[1]));
+    } else {
+        operand2_i = shift_register(shift_name_pointer, rest_pointer);
+    } 
+
+    rmI = reg_from_string(remove_leading_spaces(Rm));
+    operand2_i |= rmI;
+    
+    return operand2_i;
 }
 
 uint32_t ass_data_transfer(char *given, int place){
 
     char *mnemonic = get_mnemonic(given);
     char *args = get_rest(given);
-
-    char *rd_str = malloc(10);
-    char *address = malloc(30);
+    char *address = calloc(50,1);
+    char rd_str[20];
+    uint32_t result;
     
     
     sscanf(args, "%[^','],%[^\n]", rd_str, address);
-    
- 
-    address = remove_leading_space(address);
-
-    int rd = reg_from_string(rd_str);
-    int load = 1;
-
-    if (!strcmp(mnemonic, "str")){
-        load = 0;
-    }
-
+    address = remove_leading_spaces(address);
+    Rd = reg_from_string(rd_str);
+    L = (!(strcmp(mnemonic, "str") == 0));
 
     if (address[0] == '='){
-        uint32_t loc = str_to_hex(address);
-        if (loc <= 0xff){
-            return do_mov(rd, loc);
+        In = 1;
+        //address is of form <=expression> (ldr only).
+        uint32_t location = str_to_hex(address);
+
+        if (location <= 0xff){
+            return do_mov(Rd, location);
         } else {
-            return place_at_end(rd, loc, load, place);
+            return place_at_end(location, place);
         }
+
 
     } else if (!is_immediate(address)){
-        char *pre_reg = malloc(15);
-        char *pre_off = malloc(15);
+        In = 0;
+        // address is of form: - [Rn,<#expression>]
+        //                     - [Rn]
 
-        if (has_sqb_before_comma(address)){
-            sscanf(address, "%[^','],%s", pre_reg, pre_off);
-            if (pre_off[0] == 'r'){
-                return do_offset(rd, reg_from_string(pre_reg), atoi(&pre_off[1]), load, 0, 1);
+        char *base_reg = malloc(15);
+        char *offset_str = malloc(15);
+
+        if (is_post_indexed(address)){ //CHECK THIS IS RIGHT
+            // Post-indexing
+            // Address is of form: - [Rn], <#expression>
+            //                     - [Rn], {+/-}Rm{,<shift>}
+            P = 0; 
+            sscanf(address, "%[^','],%s", base_reg, offset_str);
+            Rn = reg_from_string(base_reg);
+            calculate_offset(offset_str);
+            assert(Offset <= 4095); // To fit into 12 bits!
+
+            result = build_instruction();
+
+        } else {
+            //Pre indexing
+            // address of form: - [Rn, <#expression>]
+            //                  - [Rn, {+/-}Rm{,<shift>}]
+            //                  - [Rn]
+
+            P = 1;
+
+            sscanf(address, "%[^','],%[^\n]", base_reg, offset_str);
+
+            if(!has_comma(address)){
+                U = 1;
+                Offset = 0;
+            } else {
+                calculate_offset(offset_str);
             }
-            else return do_offset(rd, reg_from_string(pre_reg), atoi(&pre_off[1]), load, 0, 0);
+            base_reg = remove_leading_spaces(base_reg);
+            Rn = reg_from_string(base_reg);
+
+            result = build_instruction();
+
         }
-        if (has_comma(address)){
-            sscanf(address, "%[^','],%[^\n]", pre_reg, pre_off);
-           
-            pre_reg = remove_leading_space(pre_reg);
-            pre_off = remove_leading_space(pre_off);
-            return do_offset(rd, reg_from_string(pre_reg), atoi(&pre_off[1]), load, 1, 0);
-        }
-        else return direct_register(rd, reg_from_string(address), load);
+
+        free(base_reg);
+        free(offset_str);
+        return result;
+
+    } else {
+        Rn = reg_from_string(address);
+        return direct_register();
+        result = 0;
     }
-    return 0;
+    
+    return result;
 }
 
 

@@ -3,11 +3,11 @@
 
 #include <string.h>
 
-extern const uint32_t mask1; 
-extern const uint32_t mask2; 
-extern const uint32_t mask4;  
-extern const uint32_t mask5; 
-extern const uint32_t mask8;  
+extern const uint32_t mask1;
+extern const uint32_t mask2;
+extern const uint32_t mask4;
+extern const uint32_t mask5;
+extern const uint32_t mask8;
 
 extern int carryout;
 
@@ -49,7 +49,7 @@ int is_immediate(char *rstring);
 
 int is_elem_of(char *search_string, char *list[] , unsigned long int len);
 
-int has_sqb_before_comma(char *address);
+int is_post_indexed(char *address);
 
 char* remove_leading_spaces(char *string);
 

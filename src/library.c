@@ -112,8 +112,8 @@ char *itoa(uint i, char b[]){
 }
 
 void overwrite_debug_file(void) {
-	FILE *df;
-	char nothing = '\0';
+    FILE *df;
+    char nothing = '\0';
     if ((df = fopen("debug_file", "w")) == NULL) {
         perror("Error opening file!");
         exit(EXIT_FAILURE);
@@ -126,14 +126,14 @@ void overwrite_debug_file(void) {
 void print_to_debug(int32_t *registers, unsigned char *memory) {
     // register value b= 10 digits = 10 chars *15 cos 15 registers
     // 16 chars for address + 10 chars for content
-    FILE *df;
-
+    FILE *df; 
     if ((df = fopen("debug_file", "a")) == NULL) {
         perror("Error opening file!");
         exit(EXIT_FAILURE);
     }
 
-    //char int_as_string[16];
+  //  char int_as_string[16];
+  
     fprintf(df, "[[");
     for(int i = 0; i < 17; ++i) {
         fprintf(df, "%d", registers[i]);
@@ -164,8 +164,7 @@ void print_to_debug(int32_t *registers, unsigned char *memory) {
     }
 
 
-    fprintf(df, "]]\n");
-
+    fprintf(df, "]]\n"); 
     fclose(df);
 }
 
@@ -303,6 +302,8 @@ int sign_extend(int value, int length){
 }
 
 int reg_from_string(char *rstring){
+    //PRE:
+    //POST: returns register number i.e  [r3] -> 3
     if (rstring[0] == '['){
         return reg_from_string(&rstring[1]);
     }
@@ -323,18 +324,113 @@ int has_comma(char *address){
     return 0;
 }
 
-int has_sqb_before_comma(char *address){
-    int hassqb = 0;
+int is_post_indexed(char *address){
+    //int hassqb = 0;
+    char *before_bracket = calloc(20,1);
+    char *after_bracket = calloc(20,1);
+    int post_indexed;
+
+    address = remove_leading_spaces(address);
     int i = 0;
     while (address[i] != '\0'){
         if (address[i++] == ']'){
-            hassqb = 1;
+            post_indexed = 1; //[r4     ]
+            break;
         }
         if (address[i] == ','){
-            return hassqb;
+            post_indexed = 0; //[r2,]
+            break;
         }
     }
-    return 0;
+
+    if(post_indexed){
+        if(!(has_comma(address))){
+            post_indexed = 0;
+        } 
+    }
+
+    free(before_bracket);
+    free(after_bracket);
+    return post_indexed;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+// suggestion thing
+int string_compare(char *s1, char *s2) {
+
+    int length = strlen(s1);
+    int count = 0;
+
+    for ( int i = 0; i < length; i++ ) {
+        if ( s1[i] == s2[i] ) {
+            count++;
+        } 
+    }
+    return count;
+}
+
+char *get_suggestions(char *s, char *list[], int length) {
+
+    int max_suggestion_size = 5 * sizeof(char);
+    char *suggestions = calloc((length * max_suggestion_size) + (20 * sizeof(char)), 1);    char *append;
+    
+    if ( strlen(s) == 1 ) {
+        strcat(suggestions, "b");
+    } else if ( strlen(s) >= 5 ) {
+        strcat(suggestions, "andeq");
+    } else {
+        char *s2 = malloc ( 5 );
+        strcpy(s2, " ");
+        strcat(s2, s);
+        char *s3 = s++; 
+        for(int i = 0; i < length; i++) {
+            if( string_compare(s, list[i]) >= 2 || string_compare(s2, list[i]) >= 2 || string_compare(s3, list[i]) >= 2 ) {
+                append = list[i];
+                strcat(suggestions, " ");
+                strcat(suggestions, append);
+            }
+        }
+    }
+    return remove_leading_spaces(suggestions);
+}
+
+
+
+char *valid_instructions[] = { "add", "sub", "rsb", "and", "eor", "orr", "mov", 
+                                   "tst", "teq", "cmp", "mul", "mla", "ldr", "str", 
+                                   "beq", "bne", "bge", "blt", "bgt", "ble", "lsl",
+                                   "bal", "b"};
+
+int valid_instructions_length = sizeof(valid_instructions) / 8;
+ 
+ void suggest(char *input_string, int line_number) {
+
+ //   char *result = malloc ( 200 * sizeof(char) );
+
+    int valid_instructions_length = sizeof(valid_instructions)/8;
+    char *suggestion = get_suggestions(input_string, valid_instructions, valid_instructions_length);
+    FILE *df;
+    if ((df = fopen("debug_suggestions", "a")) == NULL) {
+        perror("Error opening file!");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(df, "[%d, \"%s\", \"%s\"]\n", line_number, input_string, suggestion);
+    fclose(df);
+  //  return result;
+}
+
+int is_valid_instruction(char *string) {
+    return ( is_elem_of(string, valid_instructions, valid_instructions_length));
 }
 
 int is_elem_of(char *search_string, char *list[] , unsigned long int len) {
@@ -362,90 +458,6 @@ char* remove_leading_spaces(char *string){
     return string;
 
 }
-
-
-// suggestion thing
-int string_compare(char *s1, char *s2) {
-
-    int length = strlen(s1);
-    int count = 0;
-
-    for ( int i = 0; i < length; i++ ) {
-        if ( s1[i] == s2[i] ) {
-            count++;
-        } 
-    }
-    return count;
-}
-
-char *get_suggestions(char *s, char *list[], int length) {
-
-    int max_suggestion_size = 5 * sizeof(char);
-    char *suggestions = calloc((length * max_suggestion_size) + (20 * sizeof(char)), 1);
-    char *append;
-    
-    if ( strlen(s) == 1 ) {
-        strcat(suggestions, "b");
-    } else if ( strlen(s) >= 5 ) {
-        strcat(suggestions, "andeq");
-    } else {
-        char *s2 = malloc ( 5 );
-        strcpy(s2, " ");
-        strcat(s2, s);
-        char *s3 = s++; 
-        for(int i = 0; i < length; i++) {
-            if( string_compare(s, list[i]) >= 2 || string_compare(s2, list[i]) >= 2 || string_compare(s3, list[i]) >= 2 ) {
-                append = list[i];
-                strcat(suggestions, " ");
-                strcat(suggestions, append);
-            }
-        }
-    }
-    return remove_leading_spaces(suggestions);
-}
-
-    char *valid_instructions[] = { "add", "sub", "rsb", "and", "eor", "orr", "mov", 
-                                   "tst", "teq", "cmp", "mul", "mla", "ldr", "str", 
-                                   "beq", "bne", "bge", "blt", "bgt", "ble", "lsl",
-                                   "bal", "b"};
-                                   
-    int valid_instructions_length = sizeof(valid_instructions)/8;
-
-
-void suggest(char *input_string, int line_number) {
-
- //   char *result = malloc ( 200 * sizeof(char) );
-    
-    char *suggestion = get_suggestions(input_string, valid_instructions, valid_instructions_length);
-    FILE *df;
-    if ((df = fopen("debug_suggestions", "a")) == NULL) {
-        perror("Error opening file!");
-        exit(EXIT_FAILURE);
-    }
-    fprintf(df, "[%d, \"%s\", \"%s\"]\n", line_number, input_string, suggestion);
-    fclose(df);
-  //  return result;
-}
-
-int is_valid_instruction(char *string) {
-    return ( is_elem_of(string, valid_instructions, valid_instructions_length));
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
