@@ -4,18 +4,91 @@
 
 \begin{document}
 
-\title{Our Extension...}
-\author{TODO}
+\title{ARM Emulator, Assembler and Graphical Debugging Tools}
+\author{Jack Thorp, Denise Carroll, Zuhayr Chagpar, Joel Auterson}
 
 \maketitle
 
 \section{Introduction}
+Our task was to create and document an ARM emulator and assembler, a GPIO program for the Raspberry Pi's LED, and an extension. In this document we shall explain our implementation of these four different parts to the project, as well as an analysis of difficulties we faced and how we worked as a group.
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor
-incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-culpa qui officia deserunt mollit anim id est laborum.
+The extension we chose to build was a suite of graphical debugging tools for the emulator and assembler. We will also analyse use cases for this software.
+
+\section{Group work}
+Our group work has been excellent throughout the project, and we have both increased our productivity and enjoyed the project more by doing it together.  We used a combination of group work, and individual work using GitHub to keep track of each other, and were in constant communication.
+
+In part 1 and 2, the emulator/assembler, we each wrote the code for emulating/assembling a specific instruction individually. All of the other code in the emulator/assembler was written as a group. This was because when we were starting out on each part, it was easier to work together and share ideas because we were either beginners on C and/or the specification was unfamiliar.
+
+Once we had set up the first parts, such as the reader/parser, we could branch off into the instructions we were doing indivually. To coordinate our work here, we arranged another meeting for a few days time so that we could review our work and fix problems.
+
+We then put it all together and continued to finish the code. This was easier to do together because we could talk about the code that we all did individually, and make it work as one. We also debugged together because we found it easier to spot small problems/typos/silly mistakes as a group rather than individually.
+
+For part 3 we did the whole thing as a group, this is because we had to figure out how to set up the raspberry pi and in comparison it was a much shorter task than the others. For the extension we all did a different bit and put it together to display on the UI.
+
+In general, our coordination of work went really well, we managed to keep to any mini-deadlines we set between us and no one was a 'passenger'. We finished the majority of the project well before the deadline, so we feel that a combination of both task-assigned individual work and group coding worked well for us.
+
+One of the main benefits of working in a group was the fact that we could discuss and overcome problems together. The fact that we were new to C meant that there were difficulties understanding some of the concepts, especially at the beginning, but working together we think made it much easier to get through it.
+
+We could also share ideas on the method of implementation and these discussions not only improved our project, but our team skills in general.
+
+Another benefit was being able to learn how to keep organised, from keeping our code readable, to pushing to git regularly, turning up to meetings on time and keeping to deadlines we set within the group.
+
+\section{Emulator}
+When we started the project, no one in the group had programmed in C, so our first challenge was getting to grips with C and its pointers. The emulator inputs binary instructions and runs them as if it were an ARM processor. The emulator then outputs the contents of the registers and the values of memory which are non-zero, along with their address.
+
+We started the project with all of us together, as we could then ask each other questions on the specification which would help our understanding of our task. Once we programmed our binary loader, we then split up the task as there were four different possible instructions. During this stage, we decided to split up the instructions into different files and then link them up using header files.
+
+At this point, Jack had the brilliant idea of creating a library with common functions that the different files could use. This included functions like {\bf print\_bits} that took an in and printed to terminal the integer as binary, which was vital for our testing. {\bf generate\_mask} was also very useful as it allowed us to create a mask of length {\it n}. We decided to also declare some commonly used masks as constants so it was a slightly more efficient.
+
+The data processing instruction likely took the longest due it having multiple forms. We tested the four instruction types simply by giving each file a main function, and processing sample instructions, either from the various test cases provided in the test suite, or ones that we had come up with. Once we were happy with their performance, we worked on the loop of emulate. We had to implement a pipeline where a fetch, a decode and an execution all occured in one loop, which wasn't too difficult to figure out, but after quickly putting it together, we saw that very few of the test cases passed. After a bit of probing as to which tests were failing and what they had in common, we spotted that after a branch instruction was processed, the PC wasn't actually being affected - it would just carry on to the next line. After we corrected our mistake, we corrected out formatting of the outputted register values and the non-zero memory so that it matched up to the expected results in the test suite. A few more bug fixes later and we had it all working, except for the few optional cases. Spurred on by our fantastic results, we implemented the optional cases and tested them. Since we didn't need all four of us working on the optional cases, we split into pairs, where one pair worked on the optional cases and other started working on the assembler.
+
+One of the challenges we faced was just getting to terms with the specification. We spent a few hours just going through it and writing notes before we didn't any of the major coding. For some of the group members, it was useful to jot down our ideas and thoughts on the code onto paper and allowed us to figure out what we had to do and how we could go about doing it. Since we had just finished exams when we started the project, we had all become a little lazy so it took a little while to get our heads around C. We were still learning about it during the entire project, but we understood most of what we needed to by the time we completed the emulator. For most of the group, it was our first time using GitHub for a group collaboration, and so making sure we pulled changes before we started working took a little while to get used to. We didn't have any major issues using GitHub and it allowed us to keep others informed regarding what we had implemented. Since we mostly worked together, the GitHub commit messages didn't need to be overly descriptive, but we decided that we should describe in some detail what the commit added or changed so that we could keep a decent history of our work.
+
+\section{Assembler}
+\subsection{Introduction}
+TODO
+
+\subsection{Data Processing}
+In assemble the data processing instruction is implemented by splitting the instruction into its mnemonic and the rest, then finding the intruction type (RESULT/SINGLE\_OPERAND/CPSR) which will then find the values for S, Rd, and Rn which will be different depending on the type. The condition is always the same, and the opcode and operand2 are calculated regardless of the type because they will always use the same method. Each of these values are then shifted to the correct place for the result in binary.
+
+\subsection{Single Data Transfer}
+TODO
+
+\subsection{Multiply}
+TODO
+
+\subsection{Branch}
+
+\section{Extension - Graphical Debugging Suite}
+\subsection{Introduction}
+For our extension, we chose to build some tools to assist in the debugging of assembly code, along with a simple user interface for easy viewing of the information acquired.
+
+The suite consists of two parts. Assembly code is run through our assembler, which now has a built-in tool to provide suggestions for invalid commands in a GUI. If the code passes this tool, it is then assembled and passed directly into the emulator, where it is run. After the emulator has finished, our second tool is called, which analyses the memory and register values on each step of the program, and then presents them in another GUI. 
+
+The emulator debugger does not simply display values for each line of the assembly file - rather, loops and jumps are taken into account, and so the user can view what the program is doing at very precise points throughout execution. Even if the program goes into an infinite loop due to broken assembly code, once it is killed using {\bf Ctrl+C} the GUI will launch regardless, showing every step that is executed.This allows the user to view in great detail which instructions are being executed repeatedly, as well as their program counters and flags, for example.
+
+In this section of the report, we shall discuss the implementation, and the difficulties thereof, of the three different parts to our extension.
+
+\subsection{Assembler suggestions}
+As part of the debugger, we implemented a checker and suggestor for the opcodes of assembly code.
+
+The assembler will extract the opcode from each line of assembly code, and check if it is valid. If it is, then the normal assembly processing continues, otherwise it will output an error and suggestions (like a spelling corrector) for what the opcode should have been.
+
+The suggestion algorithm takes the invalid opcode, and a list of valid opcodes, and the line number of the instruction with the invalid opcode. The line number is necessary for the debug user interface.
+
+The algorithm first checks for an invalid opcode length of 1, in which case the only reasonable suggestion can be 'b', and also for a length of greater than 5, in which case the only reasonably suggestion would be 'andeq'.
+
+It then needs to process the strings of length 2, 3, 4. The helper function we use for this does a char-wise comparison between two strings, and adds to a counter every time that two chars are equal. For the case of an input of 3, the helper function simply takes the invalid opcode and outputs any suggestions that have two or more chars the same. For an input of 2, the helper function is sent that string as normal, and also a string with one space inserted into the front to push the characters forward for increased suggestions. For the case of four, this is similar except chars are cut off in places rather than added.
+
+The suggestor has limited functionality for a large range of valid instructions, but is well suited for this task where are are less than 25 valid instructions.
+
+\subsection{GUI}
+The user interface consists of two different windows - one for the assembler corrections, and one for the emulator analysis. The GUI is written in Python, using the GTK+ 3.0 library. The program reads from two different files - {\it debug\_file} and {\it debug\_suggestions}, which are both created by the debugging methods in the C codebase. If the first file is empty, the program assumes there was something wrong with the assembly and runs the suggestions window. Otherwise, it launches the memory/registers analysis window.
+
+The program relies on parsing the assembly file by line number. Unfortunately, due to the fact that we use instructions and not labels for outputting debug information (because there is little point debugging a label name), there is a discrepancy between debug output lines and the actual lines of the assembler. This meant that a method named {\bf fix\_assem\_file()} was necessary. This method rebuilds the assembly file, removing labels, and uses this as the source file for assembly instructions.
+
+The windows use several GTK widgets to display information. The most important of these was the {\bf Gtk.TreeView} widget, which is used to display the scrolling list at the side of both windows, and the tables on the analysis display. The TreeView's content is generated using a model, a {\bf Gtk.ListStore}, which is essentially an array of tuples into which the values for the columns are put. We had to parse the files separately to get the specific line for each list item, then parse this to get the register and memory values. Rather than parse the whole thing at once, taking up more memory, we have the program parse a specific line using Python's {\bf enumerate} function, which allowed us to get a specific line from a file without reading the whole thing, each time an instruction is activated in the list. The files are encoded manually into JSON in the C codebase, and then decoding using Python's built-in JSON bindings.
+
+As described above, most of the hard work was done in C, though Python proved invaluable for easily scripting a user interface.
 
 \end{document}
